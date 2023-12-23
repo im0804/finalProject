@@ -53,12 +53,14 @@
                 android:layout_weight="40"
                 android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/imageView"
+                <ImageButton
+                    android:id="@+id/pfpIB"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="30"
-                    android:src="@tools:sample/avatars" />
+                    android:src="@drawable/pfp"
+                    android:onClick="pfp"
+                    />
 
                 <Space
                     android:layout_width="match_parent"
@@ -89,7 +91,8 @@
                             android:id="@+id/genderSW"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="40" />
+                            android:layout_weight="40"
+                            android:checked="false"/>
 
                         <TextView
                             android:id="@+id/textView2"
@@ -232,6 +235,20 @@
                     android:layout_weight="5" />
 
                 <EditText
+                    android:id="@+id/cityET"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="10"
+                    android:ems="10"
+                    android:hint="city"
+                    android:inputType="textPostalAddress" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="5" />
+
+                <EditText
                     android:id="@+id/addressET"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -266,7 +283,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:text="NEXT" />
+            android:text="NEXT"
+            android:onClick="next"/>
 
         <Space
             android:layout_width="match_parent"

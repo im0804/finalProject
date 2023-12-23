@@ -35,7 +35,7 @@
             android:layout_weight="5" />
 
         <EditText
-            android:id="@+id/editTextText2"
+            android:id="@+id/yearsOfCoachingET"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
@@ -58,13 +58,13 @@
         <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="20">
+            android:layout_weight="40">
 
             <RadioButton
-                android:id="@+id/rb2"
+                android:id="@+id/rb1"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5"
+                android:layout_weight="8"
                 android:checked="true"
                 android:text="1" />
 
@@ -72,113 +72,30 @@
                 android:id="@+id/rb2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5"
+                android:layout_weight="8"
                 android:text="2" />
 
             <RadioButton
                 android:id="@+id/rb3"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5"
+                android:layout_weight="8"
                 android:text="3" />
 
             <RadioButton
                 android:id="@+id/rb4"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5"
+                android:layout_weight="8"
                 android:text="4" />
 
             <RadioButton
                 android:id="@+id/rb5"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5"
+                android:layout_weight="8"
                 android:text="5" />
 
-            <RadioGroup
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="40">
-
-                <RadioButton
-                    android:id="@+id/rb2"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="5"
-                    android:checked="true"
-                    android:text="1" />
-
-                <RadioButton
-                    android:id="@+id/rb2"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="5"
-                    android:text="2" />
-
-                <RadioButton
-                    android:id="@+id/rb3"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="5"
-                    android:text="3" />
-
-                <RadioButton
-                    android:id="@+id/rb4"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="5"
-                    android:text="4" />
-
-                <RadioButton
-                    android:id="@+id/rb5"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="5"
-                    android:text="5" />
-
-                <RadioGroup
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="40">
-
-                    <RadioButton
-                        android:id="@+id/rb2"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="5"
-                        android:checked="true"
-                        android:text="1" />
-
-                    <RadioButton
-                        android:id="@+id/rb2"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="5"
-                        android:text="2" />
-
-                    <RadioButton
-                        android:id="@+id/rb3"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="5"
-                        android:text="3" />
-
-                    <RadioButton
-                        android:id="@+id/rb4"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="5"
-                        android:text="4" />
-
-                    <RadioButton
-                        android:id="@+id/rb5"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="5"
-                        android:text="5" />
-                </RadioGroup>
-            </RadioGroup>
         </RadioGroup>
 
         <Space
@@ -200,7 +117,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:text="join" />
+            android:text="finish"
+            android:onClick="finish"/>
 
         <Space
             android:layout_width="match_parent"

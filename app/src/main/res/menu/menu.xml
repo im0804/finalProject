@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/register"
+        android:title="register"
+        android:orderInCategory="100" />
+
+    <item
+        android:id="@+id/main"
+        android:title="main"
+        android:orderInCategory="200" />
+
+    <item
+        android:id="@+id/profile"
+        android:title="profile"
+        android:orderInCategory="300"/>
+
+    <item
+        android:id="@+id/coach"
+        android:title="coach profile"
+        android:orderInCategory="400" />
+
+
+</menu>
