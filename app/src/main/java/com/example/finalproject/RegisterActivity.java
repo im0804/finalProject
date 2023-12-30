@@ -1,5 +1,8 @@
 package com.example.finalproject;
 
+import static com.example.finalproject.ReferencesFB.*;
+import static com.example.finalproject.LoginActivity.userFB;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -21,16 +24,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+
+import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -44,28 +45,19 @@ import java.io.IOException;
  * @author		inbar menahem
  * @version	    1
  * @since		21/12/2023
- * the opening activity for the user to open an account
+ * the register activity for the user to open an account.
  */
 public class RegisterActivity extends AppCompatActivity {
     EditText fullNameET, userNameET, distanceET, ageET, addressET, cityET, yearsOfPlayET;
     Switch genderSW;
     ImageButton pfpIB;
-    UsersClass user;
+    RadioButton begRB, amRB, advRB, tourRB;
+    public static UsersClass user;
     String Uid, fullName, userName, address, city, gender;
     int distance, age, yearsOfPlay, level, ratingLevel;
-    Intent si;
+    Intent si,gi;
     AlertDialog.Builder adb;
-
-    private FirebaseAuth mAuth;
-    public static FirebaseStorage storage = FirebaseStorage.getInstance();
-    public static StorageReference storageRef = storage.getReference();
-    StorageReference imagesRef = storageRef.child("images/" + "users" + ".jpg");
-    private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 1;
-    private static final int PICK_IMAGE_REQUEST = 2;
-    private static final int REQUEST_CAMERA_PERMISSION = 1;
-    private static final int REQUEST_IMAGE_CAPTURE = 2;
-    private static final int REQUEST_READ_EXTERNAL_STORAGE_PERMISSION = 3;
-    private static final int REQUEST_PICK_IMAGE = 4;
+    public static StorageReference imageRef;
 
 
     @Override
@@ -81,6 +73,14 @@ public class RegisterActivity extends AppCompatActivity {
         yearsOfPlayET = (EditText) findViewById(R.id.yearsOfPlayET);
         genderSW = (Switch) findViewById(R.id.genderSW);
         pfpIB = (ImageButton) findViewById(R.id.pfpIB);
+        begRB = (RadioButton) findViewById(R.id.begRB);
+        amRB = (RadioButton) findViewById(R.id.amRB);
+        advRB = (RadioButton) findViewById(R.id.advRB);
+        tourRB = (RadioButton) findViewById(R.id.tourRB);
+
+        gi = getIntent();
+        Uid = userFB.getUid();
+        imageRef = imagesRef.child(Uid);
 
         adb = new AlertDialog.Builder(this);
 
@@ -109,9 +109,18 @@ public class RegisterActivity extends AppCompatActivity {
             city = cityET.getText().toString();
             address = addressET.getText().toString();
             yearsOfPlay = Integer.parseInt(yearsOfPlayET.getText().toString());
-            //Uid = mAuth.getUid();
-            Uid = "122545";
+            if (begRB.isChecked()){
+                level = 1;
+            } else if (amRB.isChecked()) {
+                level = 2;
+            } else if (advRB.isChecked()) {
+                level = 3;
+            } else if (tourRB.isChecked()) {
+                level = 4;
+            }
+            Uid = userFB.getUid();
             user = new UsersClass(Uid, fullName, userName, age, gender, address, city, level, ratingLevel, yearsOfPlay, distance);
+            refUsers.child(Uid).setValue(user);
             si = new Intent(this, MainActivity.class);
             startActivity(si);
         }
@@ -168,7 +177,7 @@ public class RegisterActivity extends AppCompatActivity {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             byte[] imgData = baos.toByteArray();
-            imagesRef.putBytes(imgData)
+            imageRef.putBytes(imgData)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -200,7 +209,7 @@ public class RegisterActivity extends AppCompatActivity {
                 Uri file = data.getData();
                 if (file != null) {
                     final ProgressDialog pd=ProgressDialog.show(this,"Upload image","Uploading...",true);
-                    imagesRef.putFile(file)
+                    imageRef.putFile(file)
                             .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -258,8 +267,8 @@ public class RegisterActivity extends AppCompatActivity {
     public void showPhoto() throws IOException {
         final ProgressDialog pd = ProgressDialog.show(this, "Image download", "downloading...", true);
 
-        final File localFile = File.createTempFile("images","jpg");
-        imagesRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+        final File localFile = File.createTempFile(Uid,"jpeg");
+        imageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 pd.dismiss();
@@ -298,6 +307,18 @@ public class RegisterActivity extends AppCompatActivity {
             startActivity(si);
         }
         else if (str.equals("coach profile")){
+            Intent si = new Intent(this, CoachActivity.class);
+            startActivity(si);
+        }
+        else if (str.equals("join as coach")){
+            Intent si = new Intent(this, JoinAsCoachActivity.class);
+            startActivity(si);
+        }
+        else if (str.equals("login")){
+            Intent si = new Intent(this, LoginActivity.class);
+            startActivity(si);
+        }
+        else if (str.equals("coachAct")) {
             Intent si = new Intent(this, CoachActivity.class);
             startActivity(si);
         }

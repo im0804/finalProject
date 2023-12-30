@@ -21,5 +21,20 @@
         android:title="coach profile"
         android:orderInCategory="400" />
 
+    <item
+        android:id="@+id/joinAsCoach"
+        android:title="join as coach"
+        android:orderInCategory="500" />
+
+    <item
+        android:id="@+id/login"
+        android:title="login"
+        android:orderInCategory="600" />
+
+    <item
+        android:id="@+id/coachAct"
+        android:title="coach"
+        android:orderInCategory="700" />
+
 
 </menu>

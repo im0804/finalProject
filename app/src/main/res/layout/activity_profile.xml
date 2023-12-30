@@ -9,7 +9,7 @@
     <Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="5" />
+        android:layout_weight="2" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -26,13 +26,13 @@
             android:id="@+id/textView16"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10"
+            android:layout_weight="8"
             android:text="user name" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="40"
+            android:layout_weight="48"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -58,7 +58,7 @@
                     android:id="@+id/yearsOfCoachingTV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="20"
                     android:text="years of coaching" />
 
                 <Space
@@ -70,7 +70,7 @@
                     android:id="@+id/coachTypeTV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="20"
                     android:text="coach type" />
 
                 <Space
@@ -82,13 +82,13 @@
                     android:id="@+id/coachDesTV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="20"
+                    android:layout_weight="30"
                     android:text="coach description" />
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="40" />
+                    android:layout_weight="20" />
             </LinearLayout>
 
             <Space
@@ -132,71 +132,76 @@
                 android:layout_weight="30"
                 android:orientation="vertical">
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="3" />
+
                 <TextView
                     android:id="@+id/fullNameTV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="12"
                     android:text="full name" />
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="5" />
+                    android:layout_weight="3" />
 
                 <TextView
                     android:id="@+id/userNameTV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="12"
                     android:text="user name" />
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="5" />
+                    android:layout_weight="3" />
 
                 <TextView
                     android:id="@+id/distanceTV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="12"
                     android:text="distance" />
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="5" />
+                    android:layout_weight="3" />
 
                 <TextView
                     android:id="@+id/ageTV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="12"
                     android:text="age" />
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="5" />
+                    android:layout_weight="3" />
 
                 <TextView
                     android:id="@+id/cityTV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="12"
                     android:text="city" />
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="5" />
+                    android:layout_weight="3" />
 
                 <TextView
                     android:id="@+id/yearsOfPlayTV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="12"
                     android:text="years of play" />
             </LinearLayout>
 
@@ -205,7 +210,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="2" />
 
         <TextView
             android:id="@+id/textView28"
