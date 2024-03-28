@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -40,7 +41,7 @@ import java.io.IOException;
  */
 
 public class ProfileActivity extends AppCompatActivity {
-    TextView fullNameTV, userNameTV, distanceTV, ageTV, cityTV, yearsOfPlayTV, yearsOfCoachingTV, coachTypeTV, coachDesTV;
+    TextView fullNameTV, userNameTV, distanceTV, ageTV, cityTV,genderTV, yearsOfPlayTV, yearsOfCoachingTV, coachTypeTV, coachDesTV, titleTV;
     ListView historyMatchesLV;
     ImageView pfpIV;
     LinearLayout coachLayout;
@@ -62,6 +63,7 @@ public class ProfileActivity extends AppCompatActivity {
         userNameTV = (TextView) findViewById(R.id.userNameTV);
         distanceTV = (TextView) findViewById(R.id.distanceTV);
         ageTV = (TextView) findViewById(R.id.ageTV);
+        genderTV = (TextView) findViewById(R.id.genderTV);
         cityTV = (TextView) findViewById(R.id.cityTV);
         yearsOfPlayTV = (TextView) findViewById(R.id.yearsOfPlayTV);
         yearsOfCoachingTV = (TextView) findViewById(R.id.yearsOfCoachingTV);
@@ -71,6 +73,7 @@ public class ProfileActivity extends AppCompatActivity {
         pfpIV = (ImageView) findViewById(R.id.pfpIV);
         coachLayout = (LinearLayout) findViewById(R.id.coachLayout);
         coachLayout.setVisibility(coachLayout.GONE);
+        titleTV = (TextView) findViewById(R.id.titleTV);
 
         Uid = userFB.getUid();
         imageRef = imagesRef.child(Uid);
@@ -79,17 +82,15 @@ public class ProfileActivity extends AppCompatActivity {
                 .equalTo(Uid);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dS)
-            {
-                if (dS.exists())
-                {
-                    for(DataSnapshot data : dS.getChildren())
-                    {
+            public void onDataChange(@NonNull DataSnapshot dS) {
+                if (dS.exists()) {
+                    for(DataSnapshot data : dS.getChildren()) {
                         user = data.getValue(UsersClass.class);
                         fullNameTV.setText("full name: "+'\n'+user.getFullName());
                         userNameTV.setText("user name: "+'\n'+user.getUserName());
                         distanceTV.setText("distance: "+'\n'+user.getDistance());
                         ageTV.setText("age: "+user.getAge());
+                        genderTV.setText("gender: "+user.getGender());
                         cityTV.setText("city: "+user.getCity());
                         yearsOfPlayTV.setText("years of coaching: "+'\n'+user.getYearsOfPlay());
                         //boolean isCoach = user.getIsCoach();
@@ -106,6 +107,7 @@ public class ProfileActivity extends AppCompatActivity {
                             coachDesTV.setText("coach description: "+'\n'+user.userCoach.description);
                             yearsOfCoachingTV.setText("years of coaching: "+'\n'+user.userCoach.getYearsOfCoaching());
                         }
+                        titleTV.setText(user.getUserName());
                     }
                 }
             }
@@ -117,43 +119,11 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * event listener method
-     * <p>
-     *
-     * @return	checks for changes and set the text in the texr views.
-     */
-    /*com.google.firebase.database.ValueEventListener VEL = new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dS) {
-            if (dS.exists()) {
-                for(DataSnapshot data : dS.getChildren()) {
-                    user = data.getValue(UsersClass.class);
-                    fullNameTV.setText("full name: "+user.getFullName());
-                    userNameTV.setText("user name: "+user.getUserName());
-                    distanceTV.setText("distance: "+user.getDistance());
-                    ageTV.setText("age: "+user.getAge());
-                    cityTV.setText("city: "+user.getCity());
-                    yearsOfPlayTV.setText("years of coaching: "+user.getYearsOfPlay());
-                    //boolean isCoach = user.getIsCoach();
-                    try {
-                        showPhoto();
-                    } catch (IOException e) {
-                        Toast.makeText(ProfileActivity.this, "Image failed", Toast.LENGTH_LONG).show();
-                    }
-                    if (user.getIsCoach()){
-                        coachLayout.setVisibility(coachLayout.VISIBLE);
-                        coachTypeTV.setText("coach type: "+user.userCoach.coachType);
-                        coachDesTV.setText("coach description: "+user.userCoach.description);
-                        yearsOfCoachingTV.setText("years of coaching: "+user.userCoach.getYearsOfCoaching());
-                    }
-                }
-            }
-        }
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-        }
-    };*/
+    public void edit(View view) {
+        Intent si = new Intent(this, RegisterActivity.class);
+        si.putExtra("from profile", 1);
+        startActivity(si);
+    }
 
     /**
      * show photo method

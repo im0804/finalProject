@@ -12,6 +12,9 @@ public class ReferencesFB {
     public static FirebaseAuth mAuth = FirebaseAuth.getInstance();
     public static FirebaseDatabase FBDB = FirebaseDatabase.getInstance();
     public static DatabaseReference refUsers = FBDB.getReference("Users");
+    public static DatabaseReference refInvites = FBDB.getReference("Invites");
+    public static DatabaseReference refPlayed = FBDB.getReference("played");
+    public static DatabaseReference refNotPlayed = FBDB.getReference("not played");
     public static FirebaseStorage storage = FirebaseStorage.getInstance();
     public static StorageReference storageRef = storage.getReference();
     public static StorageReference imagesRef = storageRef.child("images/ ");

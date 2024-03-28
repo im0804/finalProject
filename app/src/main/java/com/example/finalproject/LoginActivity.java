@@ -24,8 +24,11 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /**
  * The type Login activity.
@@ -94,18 +97,23 @@ public class LoginActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 pd.dismiss();
                                 if (task.isSuccessful()) {
-                                    SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-                                    SharedPreferences.Editor editor=settings.edit();
-                                    editor.putBoolean("stayConnect",conCB.isChecked());
-                                    editor.commit();
-                                    Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
-                                    Intent si = new Intent(LoginActivity.this, MainActivity.class);
-                                    userFB = mAuth.getCurrentUser();
-                                    Uid = userFB.getUid();
-                                    si.putExtra("Uid",Uid);
-                                    startActivity(si);
-                                } else {
-                                    Toast.makeText(LoginActivity.this, "e-mail or password are wrong!", Toast.LENGTH_LONG).show();
+                                    if (isValidEmail(emailET.getText().toString())){
+                                        SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                                        SharedPreferences.Editor editor=settings.edit();
+                                        editor.putBoolean("stayConnect",conCB.isChecked());
+                                        editor.commit();
+                                        Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
+                                        Intent si = new Intent(LoginActivity.this, MainActivity.class);
+                                        userFB = mAuth.getCurrentUser();
+                                        Uid = userFB.getUid();
+                                        si.putExtra("Uid",Uid);
+                                        startActivity(si);
+                                    } else {
+                                        Toast.makeText(LoginActivity.this, "e-mail or password are wrong!", Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                                else {
+                                    Toast.makeText(LoginActivity.this, "please enter a valid email.", Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
@@ -116,19 +124,24 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            SharedPreferences settings = getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-                            SharedPreferences.Editor editor = settings.edit();
-                            editor.putBoolean("stayConnect",conCB.isChecked());
-                            editor.commit();
-                            Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
-                            Intent si = new Intent(LoginActivity.this,RegisterActivity.class);
-                            userFB = mAuth.getCurrentUser();
-                            Uid = userFB.getUid();
-                            si.putExtra("Uid",Uid);
-                            startActivity(si);
+                            if (isValidEmail(emailET.getText().toString())){
+                                SharedPreferences settings = getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                                SharedPreferences.Editor editor = settings.edit();
+                                editor.putBoolean("stayConnect",conCB.isChecked());
+                                editor.commit();
+                                Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
+                                Intent si = new Intent(LoginActivity.this,RegisterActivity.class);
+                                userFB = mAuth.getCurrentUser();
+                                Uid = userFB.getUid();
+                                si.putExtra("Uid",Uid);
+                                startActivity(si);
+                            }
+                            else {
+                                Toast.makeText(LoginActivity.this, "e-mail or password are wrong!!", Toast.LENGTH_LONG).show();
+                            }
                         }
                         else {
-                            Toast.makeText(LoginActivity.this, "e-mail or password are wrong!!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity.this, "please enter a valid email.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -173,6 +186,13 @@ public class LoginActivity extends AppCompatActivity {
         ss.setSpan(span, 26, 37, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         regTV.setText(ss);
         regTV.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    public static boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 
     @Override

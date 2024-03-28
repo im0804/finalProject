@@ -19,6 +19,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +33,10 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -90,6 +95,66 @@ public class RegisterActivity extends AppCompatActivity {
             gender = "Female";
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (gi.getIntExtra("from profile", -1) != -1) {
+            Query query = refUsers
+                    .orderByChild("uid")
+                    .equalTo(Uid);
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dS) {
+                    if (dS.exists()) {
+                        for (DataSnapshot data : dS.getChildren()) {
+                            user = data.getValue(UsersClass.class);
+                            fullNameET.setText(user.getFullName());
+                            userNameET.setText(user.getUserName());
+                            distanceET.setText("" + user.getDistance());
+                            ageET.setText("" + user.getAge());
+                            cityET.setText(user.getCity());
+                            addressET.setText("" + user.getAddress());
+                            yearsOfPlayET.setText("" + user.getYearsOfPlay());
+                            if (user.getGender() == "Female") {
+                                genderSW.setChecked(false);
+                            } else {
+                                genderSW.setChecked(true);
+                            }
+                            if (user.level == 1) {
+                                begRB.setChecked(true);
+                            } else if (user.level == 2) {
+                                amRB.setChecked(true);
+                            } else if (user.level == 3) {
+                                advRB.setChecked(true);
+                            } else if (user.level == 4) {
+                                tourRB.setChecked(true);
+                            }
+
+                            try {
+                                showPhoto();
+                            } catch (IOException e) {
+                                Toast.makeText(RegisterActivity.this, "Image failed", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(RegisterActivity.this, "on cancelled", Toast.LENGTH_LONG).show();
+                }
+            });
+            addressET.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addressET.setFilters(new InputFilter[]{new CapitalizeFirstLetterInputFilter()});
+                }
+            });
+        }
+        else addressET.setFilters(new InputFilter[]{new CapitalizeFirstLetterInputFilter()});
+
+    }
+
     /**
      * method of next button.
      *  <p>
@@ -117,6 +182,12 @@ public class RegisterActivity extends AppCompatActivity {
                 level = 3;
             } else if (tourRB.isChecked()) {
                 level = 4;
+            }
+            if (genderSW.isChecked()) {
+                gender = "Female";
+            }
+            else{
+                gender = "Male";
             }
             Uid = userFB.getUid();
             user = new UsersClass(Uid, fullName, userName, age, gender, address, city, level, ratingLevel, yearsOfPlay, distance);
