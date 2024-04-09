@@ -1,11 +1,11 @@
-package com.example.finalproject;
+package com.example.finalproject.Objs;
 
 public class CoachUserClass{
-    int yearsOfCoaching;
-    String coachType;
-    String description;
+    private int yearsOfCoaching;
+    private String coachType;
+    private String description;
 
-    public CoachUserClass(){}
+    private CoachUserClass(){}
 
     public CoachUserClass(int yearsOfCoaching, String coachType, String description){
         this.yearsOfCoaching = yearsOfCoaching;

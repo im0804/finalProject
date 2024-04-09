@@ -1,15 +1,13 @@
-package com.example.finalproject;
+package com.example.finalproject.Activities;
 
-import static com.example.finalproject.LoginActivity.userFB;
+import static com.example.finalproject.Activities.LoginActivity.userFB;
 import static com.example.finalproject.ReferencesFB.*;
 //import static com.example.finalproject.RegisterActivity.imagesRef;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -22,6 +20,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.finalproject.R;
+import com.example.finalproject.RegisterActivity;
+import com.example.finalproject.Objs.UsersClass;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -100,12 +101,12 @@ public class ProfileActivity extends AppCompatActivity {
                         catch (IOException e) {
                             Toast.makeText(ProfileActivity.this, "Image failed", Toast.LENGTH_LONG).show();
                         }
-                        if (user.isCoach)
+                        if (user.getIsCoach())
                         {
                             coachLayout.setVisibility(coachLayout.VISIBLE);
-                            coachTypeTV.setText("coach type: "+'\n'+user.userCoach.coachType);
-                            coachDesTV.setText("coach description: "+'\n'+user.userCoach.description);
-                            yearsOfCoachingTV.setText("years of coaching: "+'\n'+user.userCoach.getYearsOfCoaching());
+                            coachTypeTV.setText("coach type: "+'\n'+user.getUserCoach().getCoachType());
+                            coachDesTV.setText("coach description: "+'\n'+user.getUserCoach().getDescription());
+                            yearsOfCoachingTV.setText("years of coaching: "+'\n'+user.getUserCoach().getYearsOfCoaching());
                         }
                         titleTV.setText(user.getUserName());
                     }

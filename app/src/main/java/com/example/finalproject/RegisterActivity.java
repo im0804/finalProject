@@ -1,7 +1,7 @@
 package com.example.finalproject;
 
 import static com.example.finalproject.ReferencesFB.*;
-import static com.example.finalproject.LoginActivity.userFB;
+import static com.example.finalproject.Activities.LoginActivity.userFB;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,15 +30,19 @@ import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.example.finalproject.Activities.CoachActivity;
+import com.example.finalproject.Activities.JoinAsCoachActivity;
+import com.example.finalproject.Activities.LoginActivity;
+import com.example.finalproject.Activities.MainActivity;
+import com.example.finalproject.Activities.ProfileActivity;
+import com.example.finalproject.Objs.UsersClass;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -120,20 +124,20 @@ public class RegisterActivity extends AppCompatActivity {
                             } else {
                                 genderSW.setChecked(true);
                             }
-                            if (user.level == 1) {
+                            if (user.getLevel() == 1) {
                                 begRB.setChecked(true);
-                            } else if (user.level == 2) {
+                            } else if (user.getLevel() == 2) {
                                 amRB.setChecked(true);
-                            } else if (user.level == 3) {
+                            } else if (user.getLevel() == 3) {
                                 advRB.setChecked(true);
-                            } else if (user.level == 4) {
+                            } else if (user.getLevel() == 4) {
                                 tourRB.setChecked(true);
                             }
 
                             try {
                                 showPhoto();
                             } catch (IOException e) {
-                                Toast.makeText(RegisterActivity.this, "Image failed", Toast.LENGTH_LONG).show();
+                                Toast.makeText(RegisterActivity.this, "Image failed", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }

@@ -1,9 +1,9 @@
-package com.example.finalproject;
+package com.example.finalproject.Objs;
 
 public class MessageClass {
-    String date;
-    String sendingUid;
-    String mssgContent;
+    private String date;
+    private String sendingUid;
+    private String mssgContent;
 
     public MessageClass() {
     }

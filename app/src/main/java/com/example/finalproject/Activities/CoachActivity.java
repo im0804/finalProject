@@ -1,36 +1,30 @@
-package com.example.finalproject;
+package com.example.finalproject.Activities;
 
-import static com.example.finalproject.LoginActivity.userFB;
-import static com.example.finalproject.ReferencesFB.REQUEST_CAMERA_PERMISSION;
-import static com.example.finalproject.ReferencesFB.REQUEST_IMAGE_CAPTURE;
-import static com.example.finalproject.ReferencesFB.REQUEST_PICK_IMAGE;
-import static com.example.finalproject.ReferencesFB.REQUEST_READ_EXTERNAL_STORAGE_PERMISSION;
+import static com.example.finalproject.Activities.LoginActivity.Uid;
+import static com.example.finalproject.Activities.LoginActivity.userFB;
 import static com.example.finalproject.ReferencesFB.refUsers;
 
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.finalproject.R;
+import com.example.finalproject.RegisterActivity;
+import com.example.finalproject.Objs.UsersClass;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-
-import java.io.IOException;
 
 /**
  * @author		inbar menahem
@@ -41,11 +35,8 @@ import java.io.IOException;
 public class CoachActivity extends AppCompatActivity {
     ListView searchCoachLV, closeToYouLV;
     Intent si;
-    String Uid;
     UsersClass user;
     AlertDialog.Builder adb;
-    boolean isCoach;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +46,6 @@ public class CoachActivity extends AppCompatActivity {
         searchCoachLV = (ListView) findViewById(R.id.searchCoachlV);
         closeToYouLV = (ListView) findViewById(R.id.closeToYouLV);
 
-        Uid = userFB.getUid();
         Query query = refUsers
                 .orderByChild("uid")
                 .equalTo(Uid);
@@ -65,8 +55,6 @@ public class CoachActivity extends AppCompatActivity {
                 if (dS.exists()) {
                     for (DataSnapshot data : dS.getChildren()) {
                         user = data.getValue(UsersClass.class);
-                        isCoach = user.isCoach;
-
                     }
                 }
             }
@@ -87,7 +75,7 @@ public class CoachActivity extends AppCompatActivity {
      * @return   moves the user to the sign in as a coach activity.
      */
     public void join(View view) {
-        if (isCoach){
+        if (user.getIsCoach()){
             adb.setTitle("already joined");
             adb.setMessage("choose what do you want to do");
             adb.setPositiveButton("go back to main screen", new DialogInterface.OnClickListener() {

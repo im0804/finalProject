@@ -1,64 +1,48 @@
-package com.example.finalproject;
+package com.example.finalproject.Activities;
 
-import static com.example.finalproject.LoginActivity.userFB;
+import static com.example.finalproject.Activities.LoginActivity.Uid;
 import static com.example.finalproject.ReferencesFB.refInvites;
 import static com.example.finalproject.ReferencesFB.refNotPlayed;
 import static com.example.finalproject.ReferencesFB.refUsers;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.ResolvableApiException;
-import com.google.android.gms.location.LocationCallback;
+import com.example.finalproject.Adapters.CustomAdapterCM;
+import com.example.finalproject.Adapters.CustomAdapterInvites;
+import com.example.finalproject.Adapters.CustomAdapterUserInvites;
+import com.example.finalproject.Objs.InviteClass;
+import com.example.finalproject.Objs.MatchClass;
+import com.example.finalproject.R;
+import com.example.finalproject.RegisterActivity;
+import com.example.finalproject.Objs.UsersClass;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.IOException;
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -69,7 +53,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, View.OnCreateContextMenuListener {
     ListView friendsSearchLV, closeMatchesLV, invitesLV, userInvitesLV;
-    String Uid, userName, userCity, winner;
+    String userName, userCity, winner;
     Intent si;
     UsersClass user;
     InviteClass invite;
@@ -81,12 +65,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ArrayList<MatchClass> arrMatches, arrHistory;
     ArrayList<UsersClass> arrUsers;
     ArrayList<String> arrAddresses;
+    Button btnReminder;
 
     AlertDialog.Builder adb;
 
     LocationRequest locationRequest;
     double distance;
-    int userDis, pos,count = 0;
+    int userDis, pos,counterDP = 0;
     boolean clicked = false;
 
     Calendar calNow;
@@ -106,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(5000);
         locationRequest.setFastestInterval(2000);
-        Uid = userFB.getUid();
         arrInvites = new ArrayList<InviteClass>();
         userArrInvites = new ArrayList<InviteClass>();
         arrMatches = new ArrayList<MatchClass>();
@@ -167,17 +151,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             invite = secChild.getValue(InviteClass.class);
                             if(!passedDate(invite.getKey(), calNow)){
                                 if (Uid.equals(invite.getUid())){
-
                                     userArrInvites.add(invite);
                                 }
                                 else {
-                                    invite = secChild.getValue(InviteClass.class);
                                     arrInvites.add(invite);
                                 }
                             }
                             else {
-                                Log.e("MainActivity","user.getUid()"+user.getUid());
-                                Log.e("MainActivity","invite.getKey()"+invite.getKey());
                                 refInvites.child(invite.getUid())
                                         .child(invite.getKey())
                                         .removeValue();
@@ -190,28 +170,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        refNotPlayed.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> tsk) {
-                if (tsk.isSuccessful()){
-                    DataSnapshot dS = tsk.getResult();
-                    arrMatches.clear();
-                    for (DataSnapshot data : dS.getChildren()){
-                        for (DataSnapshot secChild : data.getChildren()) {
-                            match = secChild.getValue(MatchClass.class);
-                            if(Uid.equals(match.getUidInvited())){
-                                arrMatches.add(match);
-                            }
-                            if (Uid.equals(match.getUidInviter())){
-                                arrMatches.add(match);
-                            }
-                            Toast.makeText(MainActivity.this, match.getKey(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-                    customAdapterCM.notifyDataSetChanged();
-                }
-            }
-        });
     }
 
     @Override
@@ -265,19 +223,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (tsk.isSuccessful()){
                         DataSnapshot dS = tsk.getResult();
                         arrMatches.clear();
+                        calNow = Calendar.getInstance();
                         for (DataSnapshot data : dS.getChildren()){
                             for (DataSnapshot secChild : data.getChildren()) {
                                 match = secChild.getValue(MatchClass.class);
-                                if(Uid.equals(match.getUidInvited())){
-                                    arrMatches.add(match);
+                                if (!passedDate(match.getKey(), calNow)) {
+                                    if (Uid.equals(match.getUidInvited()))
+                                        arrMatches.add(match);
+                                    if (Uid.equals(match.getUidInviter()))
+                                        arrMatches.add(match);
                                 }
-                                if (Uid.equals(match.getUidInviter())){
-                                    arrMatches.add(match);
-                                }
-                                Toast.makeText(MainActivity.this, match.getKey(), Toast.LENGTH_LONG).show();
+                                else counterDP++;
+                                //Toast.makeText(MainActivity.this, match.getKey(), Toast.LENGTH_LONG).show();
                             }
                         }
                         customAdapterCM.notifyDataSetChanged();
+                        btnReminder.setText(counterDP);
                     }
                 }
             });
@@ -319,6 +280,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         startActivity(si);
     }
 
+    public void remind(View view) {
+        if (counterDP == 0){
+            Toast.makeText(MainActivity.this, "you don't have passed meetings", Toast.LENGTH_LONG).show();
+        }
+        else {
+            Intent si = new Intent(this, ReminderActivity.class);
+            startActivityForResult(si, 1);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int source, int good, @Nullable Intent data_back) {
+        super.onActivityResult(source, good, data_back);
+        if (source == 1) {
+            if (good == RESULT_OK) {
+                counterDP--;
+                btnReminder.setText(counterDP);
+            }
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -335,8 +317,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     MatchClass match = new MatchClass(arrInvites.get(position).getUid(), arrInvites.get(position).getUserName(), Uid, userName, arrInvites.get(position).getDate(), arrInvites.get(position).getStartTime(), arrInvites.get(position).getKey(), null);
-                    refNotPlayed.child(Uid).child(arrInvites.get(position).getKey()).setValue(match);
-                    refInvites.child(arrInvites.get(position).getUid()).child(arrInvites.get(position).getKey()).removeValue();
+                    refNotPlayed.child(Uid)
+                            .child(arrInvites.get(position).getKey())
+                            .setValue(match);
+                    refInvites.child(arrInvites.get(position).getUid())
+                            .child(arrInvites.get(position).getKey())
+                            .removeValue();
                     arrInvites.remove(position);
                     arrMatches.add(match);
                     customAdapterUserInvites.notifyDataSetChanged();
@@ -356,10 +342,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if (parent.getId() == R.id.userInvitesLV) {
             pos = position;
+
         }
 
-        /*if (parent.getId() == R.id.closeMatchesLV) {
-            calNow = Calendar.getInstance();
+        if (parent.getId() == R.id.closeMatchesLV) {
+            adb.setTitle("delete meeting");
+            adb.setCancelable(false);
+            adb.setMessage("are you sure you want to delete this meeting?");
+            adb.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    refNotPlayed.child(arrMatches.get(position).getUidInvited())
+                            .child(arrMatches.get(position).getKey())
+                            .removeValue();
+                    customAdapterCM.notifyDataSetChanged();
+                }
+            });
+            adb.setNegativeButton("no", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            AlertDialog ad = adb.create();
+            ad.show();
+            /*calNow = Calendar.getInstance();
                 if (passedDate(arrMatches.get(position).getKey(), calNow)) {
                     final String[] arrwinner = {arrInvites.get(position).getUserName(), userName};
                     adb.setTitle("game, set & match!");
@@ -400,9 +407,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     });
                     AlertDialog ad = adb.create();
                     ad.show();
-                }
+                }*/
             }
-         */
         return true;
     }
 
@@ -460,5 +466,4 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

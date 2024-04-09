@@ -1,19 +1,19 @@
-package com.example.finalproject;
+package com.example.finalproject.Objs;
 
 public class UsersClass {
-    String Uid;
-    String fullName;
-    String userName;
-    int age;
-    String gender;
-    int level;
-    int ratingLevel;
-    String address;
-    String city;
-    int yearsOfPlay;
-    int distance;
-    boolean isCoach;
-    CoachUserClass userCoach;
+    private String Uid;
+    private String fullName;
+    private String userName;
+    private int age;
+    private String gender;
+    private int level;
+    private int ratingLevel;
+    private String address;
+    private String city;
+    private int yearsOfPlay;
+    private int distance;
+    private boolean isCoach;
+    private CoachUserClass userCoach;
 
     public UsersClass(){}
     public UsersClass(String uid, String fullName, String userName, int age, String gender, String address, String city, int level, int ratingLevel, int yearsOfPlay, int distance) {
@@ -43,7 +43,7 @@ public class UsersClass {
         this.yearsOfPlay = user.yearsOfPlay;
         this.distance = user.distance;
         this.isCoach = true;
-        userCoach = new CoachUserClass(userCoach1.getYearsOfCoaching(), userCoach1.coachType, userCoach1.description);
+        userCoach = new CoachUserClass(userCoach1.getYearsOfCoaching(), userCoach1.getCoachType(), userCoach1.getDescription());
     }
 
     public String getUid() {

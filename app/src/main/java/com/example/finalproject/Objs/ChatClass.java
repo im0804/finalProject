@@ -1,4 +1,4 @@
-package com.example.finalproject;
+package com.example.finalproject.Objs;
 
 public class ChatClass {
     String initiateUser;

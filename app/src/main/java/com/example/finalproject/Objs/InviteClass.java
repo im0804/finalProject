@@ -1,15 +1,15 @@
-package com.example.finalproject;
+package com.example.finalproject.Objs;
 
 public class InviteClass {
-    String Uid;
-    String userName;
-    String address;
-    String city;
-    String date;
-    String startTime;
-    String key;
-    boolean level1, level2, level3, level4, level5;
-    int distance;
+    private String Uid;
+    private String userName;
+    private String address;
+    private String city;
+    private String date;
+    private String startTime;
+    private String key;
+    private boolean level1, level2, level3, level4, level5;
+    private int distance;
 
     public InviteClass(){}
     public InviteClass(String Uid, String userName, String address, String city, String date, String start, String key, boolean level1, boolean level2, boolean level3, boolean level4, boolean level5, int distance){

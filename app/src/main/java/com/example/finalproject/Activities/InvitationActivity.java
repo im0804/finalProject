@@ -1,6 +1,7 @@
-package com.example.finalproject;
+package com.example.finalproject.Activities;
 
-import static com.example.finalproject.LoginActivity.userFB;
+import static com.example.finalproject.Activities.LoginActivity.Uid;
+import static com.example.finalproject.Activities.LoginActivity.userFB;
 import static com.example.finalproject.ReferencesFB.*;
 
 import androidx.annotation.NonNull;
@@ -14,7 +15,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -24,15 +24,15 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.finalproject.Objs.InviteClass;
+import com.example.finalproject.R;
+import com.example.finalproject.Objs.UsersClass;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 
 public class InvitationActivity extends AppCompatActivity {
     EditText distanceEt;
@@ -44,7 +44,6 @@ public class InvitationActivity extends AppCompatActivity {
     String timeFormatStart, dateFormat, dateFrormatFB, userName, userAddress, userCity, key;
     int distance, year, month, day;
     boolean level1, level2, level3, level4, level5;
-    String Uid;
     InviteClass ic;
     UsersClass user;
     boolean dateChoose = false, startButton = false, validDate = true, validTime = true;
@@ -66,7 +65,6 @@ public class InvitationActivity extends AppCompatActivity {
 
         calNow = Calendar.getInstance();
 
-        Uid = userFB.getUid();
         Query query = refUsers
                 .orderByChild("uid")
                 .equalTo(Uid);

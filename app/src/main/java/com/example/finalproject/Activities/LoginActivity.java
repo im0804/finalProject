@@ -1,4 +1,4 @@
-package com.example.finalproject;
+package com.example.finalproject.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.finalproject.R;
+import com.example.finalproject.RegisterActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -42,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     CheckBox conCB;
     TextView regorlogTV, regTV;
     Button logorregBTN;
-    String Uid;
+    public static String Uid;
     public static FirebaseUser userFB;
     boolean stayConnected, registered;
 
@@ -130,7 +132,7 @@ public class LoginActivity extends AppCompatActivity {
                                 editor.putBoolean("stayConnect",conCB.isChecked());
                                 editor.commit();
                                 Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
-                                Intent si = new Intent(LoginActivity.this,RegisterActivity.class);
+                                Intent si = new Intent(LoginActivity.this, RegisterActivity.class);
                                 userFB = mAuth.getCurrentUser();
                                 Uid = userFB.getUid();
                                 si.putExtra("Uid",Uid);

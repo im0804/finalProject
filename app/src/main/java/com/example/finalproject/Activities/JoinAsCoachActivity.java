@@ -1,6 +1,7 @@
-package com.example.finalproject;
+package com.example.finalproject.Activities;
 
-import static com.example.finalproject.LoginActivity.userFB;
+import static com.example.finalproject.Activities.LoginActivity.Uid;
+import static com.example.finalproject.Activities.LoginActivity.userFB;
 import static com.example.finalproject.RegisterActivity.user;
 import static com.example.finalproject.ReferencesFB.refUsers;
 
@@ -16,12 +17,14 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.example.finalproject.Objs.CoachUserClass;
+import com.example.finalproject.R;
+import com.example.finalproject.RegisterActivity;
+import com.example.finalproject.Objs.UsersClass;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-
-import java.io.IOException;
 
 /**
  * @author		inbar menahem
@@ -33,7 +36,7 @@ public class JoinAsCoachActivity extends AppCompatActivity {
     // להוסיף בדיקה לרדיו בטן לבדוק על המספר עליו לחץ
     EditText yearsOfCoachingEt, desET;
     RadioButton begCRB, groupsRB, competitiveRB, allRB;
-    String coachType, Uid;
+    String coachType;
     CoachUserClass userCoach;
     //UsersClass newUser;
 
@@ -49,7 +52,6 @@ public class JoinAsCoachActivity extends AppCompatActivity {
         competitiveRB = (RadioButton) findViewById(R.id.competitiveRB);
         allRB = (RadioButton) findViewById(R.id.allRB);
 
-        Uid = userFB.getUid();
         Query query = refUsers
                 .orderByChild("uid")
                 .equalTo(Uid);
@@ -59,16 +61,6 @@ public class JoinAsCoachActivity extends AppCompatActivity {
                 if (dS.exists()) {
                     for(DataSnapshot data : dS.getChildren()) {
                         user = data.getValue(UsersClass.class);
-                        user.fullName = user.getFullName();
-                        user.userName = user.getUserName();
-                        user.city = user.getCity();
-                        user.address = user.getAddress();
-                        user.age = user.getAge();
-                        user.distance = user.getDistance();
-                        user.gender = user.getGender();
-                        user.level = user.getLevel();
-                        user.ratingLevel = user.getRatingLevel();
-                        user.yearsOfPlay = user.getYearsOfPlay();
                     }
                 }
             }

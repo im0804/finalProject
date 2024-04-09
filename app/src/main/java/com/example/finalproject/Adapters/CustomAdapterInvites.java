@@ -1,4 +1,4 @@
-package com.example.finalproject;
+package com.example.finalproject.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,25 +10,28 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.finalproject.Objs.InviteClass;
+import com.example.finalproject.R;
+
 import java.util.ArrayList;
 
-public class CustomAdapterUserInvites extends BaseAdapter {
+public class CustomAdapterInvites extends BaseAdapter {
     private Context context;
-    private ArrayList<InviteClass> userArrInvites;
+    private ArrayList<InviteClass> arrInvites;
     private LayoutInflater inflater;
 
-    public CustomAdapterUserInvites(Context context, ArrayList<InviteClass> userArrInvites) {
+    public CustomAdapterInvites(Context context, ArrayList<InviteClass> arrInvites) {
         this.context = context;
-        this.userArrInvites = userArrInvites;
+        this.arrInvites = arrInvites;
         inflater = (LayoutInflater.from(context));
     }
 
     public int getCount() {
-        return userArrInvites.size();
+        return arrInvites.size();
     }
 
     public Object getItem(int position) {
-        return userArrInvites.get(position);
+        return arrInvites.get(position);
     }
 
     public long getItemId(int position) {
@@ -36,30 +39,34 @@ public class CustomAdapterUserInvites extends BaseAdapter {
     }
 
     public View getView(int position, View view, ViewGroup parent) {
-        CustomAdapterUserInvites.ViewHolder viewholder;
-        if (view == null){
-            view = inflater.inflate(R.layout.custom_lv_user_invites, parent, false);
+        CustomAdapterInvites.ViewHolder viewholder;
+        if (view == null) {
+            view = inflater.inflate(R.layout.custom_lv_invite, parent, false);
             viewholder = new ViewHolder(view);
             view.setTag(viewholder);
         }
-        else {
-            viewholder = (CustomAdapterUserInvites.ViewHolder) view.getTag();
-        }
-        if (!userArrInvites.isEmpty()) {
-            viewholder.tvDate.setText(userArrInvites.get(position).getDate());
-            viewholder.tvTime.setText(userArrInvites.get(position).getStartTime());
-            viewholder.tvLocation.setText(userArrInvites.get(position).getCity());
+        else
+            viewholder = (CustomAdapterInvites.ViewHolder) view.getTag();
+
+
+        if (!arrInvites.isEmpty()) {
+            viewholder.tvUserName.setText(arrInvites.get(position).getUserName());
+            viewholder.tvDate.setText(arrInvites.get(position).getDate());
+            viewholder.tvTime.setText(arrInvites.get(position).getStartTime());
+            viewholder.tvLocation.setText(arrInvites.get(position).getCity());
         }
         return view;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        TextView tvDate, tvTime, tvLocation;
+        TextView tvUserName, tvDate, tvTime, tvLocation;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            tvUserName = (TextView) itemView.findViewById(R.id.tvUserName);
             tvDate = (TextView) itemView.findViewById(R.id.tvDate);
             tvTime = (TextView) itemView.findViewById(R.id.tvTime);
             tvLocation = (TextView) itemView.findViewById(R.id.tvLocation);
         }
     }
+
 }

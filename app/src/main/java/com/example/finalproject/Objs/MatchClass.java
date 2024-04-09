@@ -1,15 +1,17 @@
-package com.example.finalproject;
+package com.example.finalproject.Objs;
+
+import com.example.finalproject.Objs.EndMatchClass;
 
 public class MatchClass {
-    String uidInviter;
-    String uidInvited;
-    String userNameInviter;
-    String userNameInvited;
-    String date;
-    String hour;
-    String key;
+    private String uidInviter;
+    private String uidInvited;
+    private String userNameInviter;
+    private String userNameInvited;
+    private String date;
+    private String hour;
+    private String key;
     //String location;
-    EndMatchClass endMatch;
+    private EndMatchClass endMatch;
 
     public MatchClass(){}
     public MatchClass(String uidInviter, String userNameInviter, String uidInvited, String userNameInvited, String date, String hour, String key, EndMatchClass endMatch){

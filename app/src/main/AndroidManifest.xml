@@ -5,13 +5,19 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyBEA0SUrT9m7tDq9jxL8_9N0tW-xg3i7Uk" />
 
     <application
         android:allowBackup="true"
@@ -24,7 +30,10 @@
         android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
         tools:targetApi="31">
         <activity
-            android:name=".LoginActivity"
+            android:name=".Activities.ReminderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,34 +42,29 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ProfileActivity"
+            android:name=".Activities.ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".JoinAsCoachActivity"
+            android:name=".Activities.JoinAsCoachActivity"
             android:exported="false" />
         <activity
-            android:name=".CoachActivity"
+            android:name=".Activities.CoachActivity"
             android:exported="false" />
         <activity
-            android:name=".ChatsActivity"
+            android:name=".Activities.ChatsActivity"
             android:exported="false" />
         <activity
             android:name=".LeadersActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".InvitationActivity"
+            android:name=".Activities.InvitationActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"
-            android:exported="false"/>
+            android:exported="false" />
     </application>
-
-
-    <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyBEA0SUrT9m7tDq9jxL8_9N0tW-xg3i7Uk" />
 
 </manifest>

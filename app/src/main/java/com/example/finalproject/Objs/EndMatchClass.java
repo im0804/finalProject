@@ -1,20 +1,22 @@
-package com.example.finalproject;
+package com.example.finalproject.Objs;
+
+import java.util.ArrayList;
 
 public class EndMatchClass {
-    String score;
-    String winner;
+    private ArrayList<String> score;
+    private String winner;
 
     public EndMatchClass(){}
-    public EndMatchClass(String score, String winner){
+    public EndMatchClass(ArrayList<String> score, String winner){
         this.score = score;
         this.winner = winner;
     }
 
-    public String getScore() {
+    public ArrayList<String> getScore() {
         return score;
     }
 
-    public void setScore(String score) {
+    public void setScore(ArrayList<String> score) {
         this.score = score;
     }
 
