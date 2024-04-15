@@ -46,6 +46,8 @@ public class UsersClass {
         userCoach = new CoachUserClass(userCoach1.getYearsOfCoaching(), userCoach1.getCoachType(), userCoach1.getDescription());
     }
 
+
+
     public String getUid() {
         return Uid;
     }
@@ -133,6 +135,13 @@ public class UsersClass {
         this.city = city;
     }
 
+    public boolean isCoach() {
+        return isCoach;
+    }
+
+    public void setCoach(boolean coach) {
+        isCoach = coach;
+    }
     public boolean getIsCoach() {
         return isCoach;
     }

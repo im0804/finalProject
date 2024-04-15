@@ -91,8 +91,6 @@ public class RegisterActivity extends AppCompatActivity {
         Uid = userFB.getUid();
         imageRef = imagesRef.child(Uid);
 
-        adb = new AlertDialog.Builder(this);
-
         if (genderSW.isChecked())
             gender = "Man";
         else
@@ -211,6 +209,7 @@ public class RegisterActivity extends AppCompatActivity {
      *          if the user chose gallery then it opens the gallery and upload the photo to firebase.
      */
     public void pfp(View view) {
+        adb = new AlertDialog.Builder(this);
         adb.setTitle("choose");
         adb.setMessage("choose where do you take the profile picture from");
         adb.setPositiveButton("camera", new DialogInterface.OnClickListener() {

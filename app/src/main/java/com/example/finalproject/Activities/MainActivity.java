@@ -1,11 +1,14 @@
 package com.example.finalproject.Activities;
 
 import static com.example.finalproject.Activities.LoginActivity.Uid;
+import static com.example.finalproject.ReferencesFB.REQUEST_CODE;
+import static com.example.finalproject.ReferencesFB.mAuth;
 import static com.example.finalproject.ReferencesFB.refInvites;
 import static com.example.finalproject.ReferencesFB.refNotPlayed;
 import static com.example.finalproject.ReferencesFB.refUsers;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,6 +39,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
@@ -43,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,7 +58,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, View.OnCreateContextMenuListener {
     ListView friendsSearchLV, closeMatchesLV, invitesLV, userInvitesLV;
-    String userName, userCity, winner;
     Intent si;
     UsersClass user;
     InviteClass invite;
@@ -65,16 +69,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ArrayList<MatchClass> arrMatches, arrHistory;
     ArrayList<UsersClass> arrUsers;
     ArrayList<String> arrAddresses;
+    public static ArrayList<MatchClass> arrPassed;
+    public static String userName, userCity, userAddress;
+    public static int userDis = 0;
     Button btnReminder;
 
     AlertDialog.Builder adb;
 
     LocationRequest locationRequest;
     double distance;
-    int userDis, pos,counterDP = 0;
+    int pos,counterDP = 0;
     boolean clicked = false;
 
     Calendar calNow;
+    ProgressDialog pd;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         closeMatchesLV = (ListView) findViewById(R.id.closeMatchesLV);
         invitesLV = (ListView) findViewById(R.id.invitesLV);
         userInvitesLV = (ListView) findViewById(R.id.userInvitesLV);
+        btnReminder = (Button) findViewById(R.id.btnReminder);
 
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -97,6 +107,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         arrHistory = new ArrayList<MatchClass>();
         arrUsers = new ArrayList<UsersClass>();
         arrAddresses = new ArrayList<String>();
+        arrPassed = new ArrayList<MatchClass>();
+
+        user = new UsersClass();
 
         customAdapterInvites = new CustomAdapterInvites(MainActivity.this, arrInvites);
         invitesLV.setAdapter(customAdapterInvites);
@@ -107,19 +120,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         customAdapterCM = new CustomAdapterCM(MainActivity.this, arrMatches);
         closeMatchesLV.setAdapter(customAdapterCM);
 
-        adb = new AlertDialog.Builder(this);
-
         userInvitesLV.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         invitesLV.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         closeMatchesLV.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         userInvitesLV.setOnCreateContextMenuListener(this);
         invitesLV.setOnItemLongClickListener(this);
         closeMatchesLV.setOnItemLongClickListener(this);
+
+        refInvites.addValueEventListener(velInvite);
+        refNotPlayed.addValueEventListener(velCM);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        counterDP = 0;
+        pd = ProgressDialog.show(this,"downloading data","downloading... \n it might take a minute",true);
+
         refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> tsk) {
@@ -127,11 +144,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     DataSnapshot dS = tsk.getResult();
                     for (DataSnapshot data : dS.getChildren()) {
                         user = data.getValue(UsersClass.class);
-                        if(Uid.equals(user.getUid())){
+                        if (user.getUid().equals(Uid)){
                             userDis = user.getDistance() * 1000;
                             userName = user.getUserName();
                             userCity = user.getCity();
-                            Toast.makeText(MainActivity.this, Uid, Toast.LENGTH_SHORT).show();
+                            userAddress = user.getAddress();
                         }
                     }
                 }
@@ -169,85 +186,68 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        refInvites.addValueEventListener(velInvite);
-        refNotPlayed.addValueEventListener(velCM);
+        pd.dismiss();
     }
 
     ValueEventListener velInvite = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot snapshot) {
-            refInvites.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> tsk) {
-                    if (tsk.isSuccessful()){
-                        DataSnapshot dS = tsk.getResult();
-                        arrInvites.clear();
-                        userArrInvites.clear();
-                        for (DataSnapshot data : dS.getChildren()){
-                            for (DataSnapshot secChild : data.getChildren()) {
-                                if (Uid.equals(secChild.getValue(InviteClass.class).getUid())){
-                                    invite = secChild.getValue(InviteClass.class);
-                                    userArrInvites.add(invite);
-                                }
-                                else {
-                                    invite = secChild.getValue(InviteClass.class);
-                                    arrInvites.add(invite);
-                                }
-                            }
-                        }
-                        customAdapterUserInvites.notifyDataSetChanged();
-                        customAdapterInvites.notifyDataSetChanged();
+            pd = ProgressDialog.show(MainActivity.this,"downloading data","downloading... \n it might take a minute",true);
+            arrInvites.clear();
+            userArrInvites.clear();
+            for (DataSnapshot data : snapshot.getChildren()){
+                for (DataSnapshot secChild : data.getChildren()) {
+                    invite = secChild.getValue(InviteClass.class);
+                    if (Uid.equals(secChild.getValue(InviteClass.class).getUid())){
+                        userArrInvites.add(invite);
+                    }
+                    else {
+                        arrInvites.add(invite);
                     }
                 }
-            });
+            }
+            customAdapterUserInvites.notifyDataSetChanged();
+            customAdapterInvites.notifyDataSetChanged();
+            pd.dismiss();
         }
 
         @Override
         public void onCancelled(@NonNull DatabaseError error) {
 
         }
+
     };
 
     ValueEventListener velCM = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot snapshot) {
-            refNotPlayed.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> tsk) {
-                    if (tsk.isSuccessful()){
-                        DataSnapshot dS = tsk.getResult();
-                        arrMatches.clear();
-                        calNow = Calendar.getInstance();
-                        for (DataSnapshot data : dS.getChildren()){
-                            for (DataSnapshot secChild : data.getChildren()) {
-                                match = secChild.getValue(MatchClass.class);
-                                if (!passedDate(match.getKey(), calNow)) {
-                                    if (Uid.equals(match.getUidInvited()))
-                                        arrMatches.add(match);
-                                    if (Uid.equals(match.getUidInviter()))
-                                        arrMatches.add(match);
-                                }
-                                else counterDP++;
-                                //Toast.makeText(MainActivity.this, match.getKey(), Toast.LENGTH_LONG).show();
-                            }
-                        }
-                        customAdapterCM.notifyDataSetChanged();
-                        btnReminder.setText(counterDP);
+            pd = ProgressDialog.show(MainActivity.this,"downloading data","downloading... \n it might take a minute",true);
+            arrMatches.clear();
+            counterDP = 0;
+            calNow = Calendar.getInstance();
+            for (DataSnapshot data : snapshot.getChildren()) {
+                for (DataSnapshot secChild : data.getChildren()) {
+                    match = secChild.getValue(MatchClass.class);
+                    if (!passedDate(match.getKey(), calNow)) {
+                        if (Uid.equals(match.getUidInvited()))
+                            arrMatches.add(match);
+                        if (Uid.equals(match.getUidInviter()))
+                            arrMatches.add(match);
+                    } else{
+                        counterDP++;
+                        arrPassed.add(match);
                     }
                 }
-            });
+            }
+            customAdapterCM.notifyDataSetChanged();
+            btnReminder.setText(""+counterDP);
+            pd.dismiss();
         }
 
         @Override
         public void onCancelled(@NonNull DatabaseError error) {
-
         }
+
     };
 
     public boolean passedDate(String dateString, Calendar calNow) {
@@ -260,10 +260,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         catch(ParseException e){
             throw new RuntimeException(e);
         }
+
         Calendar calStart = Calendar.getInstance();
         calStart.setTime(date);
         long start = calStart.getTimeInMillis();
-        if (TimeUnit.MILLISECONDS.toDays(end - start) > 0){
+        if (TimeUnit.MILLISECONDS.toSeconds(end - start) > 0){
             return true;
         }
         return false;
@@ -282,22 +283,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void remind(View view) {
         if (counterDP == 0){
+            btnReminder.setText("0");
             Toast.makeText(MainActivity.this, "you don't have passed meetings", Toast.LENGTH_LONG).show();
         }
         else {
             Intent si = new Intent(this, ReminderActivity.class);
-            startActivityForResult(si, 1);
+            startActivityForResult(si, REQUEST_CODE);
         }
     }
 
     @Override
-    protected void onActivityResult(int source, int good, @Nullable Intent data_back) {
-        super.onActivityResult(source, good, data_back);
-        if (source == 1) {
-            if (good == RESULT_OK) {
-                counterDP--;
-                btnReminder.setText(counterDP);
-            }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE  && resultCode  == RESULT_OK) {
+            counterDP--;
+            btnReminder.setText(""+counterDP);
         }
     }
 
@@ -311,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (parent.getId() == R.id.invitesLV) {
+            adb = new AlertDialog.Builder(this);
             adb.setTitle("find a match!");
             adb.setMessage("do you want to play against " + arrInvites.get(position).getUserName() + "?");
             adb.setPositiveButton("yes", new DialogInterface.OnClickListener() {
@@ -346,6 +348,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         if (parent.getId() == R.id.closeMatchesLV) {
+            adb = new AlertDialog.Builder(this);
             adb.setTitle("delete meeting");
             adb.setCancelable(false);
             adb.setMessage("are you sure you want to delete this meeting?");
@@ -366,48 +369,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             });
             AlertDialog ad = adb.create();
             ad.show();
-            /*calNow = Calendar.getInstance();
-                if (passedDate(arrMatches.get(position).getKey(), calNow)) {
-                    final String[] arrwinner = {arrInvites.get(position).getUserName(), userName};
-                    adb.setTitle("game, set & match!");
-                    adb.setCancelable(false);
-                    final EditText score = new EditText(this);
-                    score.setHint("enter score");
-                    adb.setView(score);
-                    adb.setItems(arrwinner, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            winner = arrwinner[which];
-                            clicked = true;
-                        }
-                    });
-                    adb.setPositiveButton("done", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (clicked) {
-                                if (!score.getText().toString().isEmpty()) {
-                                    EndMatchClass endMatch = new EndMatchClass(score.getText().toString(), winner);
-                                    arrMatches.get(position).setEndMatch(endMatch);
-                                    arrHistory.add(arrMatches.get(position));
-                                    arrMatches.remove(position);
-                                    customAdapterCM.notifyDataSetChanged();
-                                    clicked = false;
-                                } else {
-                                    Toast.makeText(MainActivity.this, "please enter score", Toast.LENGTH_LONG).show();
-                                }
-                            } else
-                                Toast.makeText(MainActivity.this, "please choose a winner", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    adb.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-                    AlertDialog ad = adb.create();
-                    ad.show();
-                }*/
             }
         return true;
     }

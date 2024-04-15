@@ -28,6 +28,7 @@ public class InviteClass {
         this.distance = distance;
     }
 
+
     public String getCity() {
         return city;
     }

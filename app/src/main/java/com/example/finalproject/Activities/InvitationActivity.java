@@ -2,6 +2,9 @@ package com.example.finalproject.Activities;
 
 import static com.example.finalproject.Activities.LoginActivity.Uid;
 import static com.example.finalproject.Activities.LoginActivity.userFB;
+import static com.example.finalproject.Activities.MainActivity.userAddress;
+import static com.example.finalproject.Activities.MainActivity.userCity;
+import static com.example.finalproject.Activities.MainActivity.userName;
 import static com.example.finalproject.ReferencesFB.*;
 
 import androidx.annotation.NonNull;
@@ -39,9 +42,8 @@ public class InvitationActivity extends AppCompatActivity {
     RadioButton RB1, RB2, RB3, RB4, RB5;
     Button startBTN;
     TextView clearTV, dateTV;
-    //final Calendar myCalendar= Calendar.getInstance();
     Calendar calNow, calSet;
-    String timeFormatStart, dateFormat, dateFrormatFB, userName, userAddress, userCity, key;
+    String timeFormatStart, dateFormat, dateFrormatFB, key;
     int distance, year, month, day;
     boolean level1, level2, level3, level4, level5;
     InviteClass ic;
@@ -65,27 +67,6 @@ public class InvitationActivity extends AppCompatActivity {
 
         calNow = Calendar.getInstance();
 
-        Query query = refUsers
-                .orderByChild("uid")
-                .equalTo(Uid);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dS) {
-                if (dS.exists()) {
-                    for (DataSnapshot data : dS.getChildren()) {
-                        user = data.getValue(UsersClass.class);
-                        userName = user.getUserName();
-                        userAddress = user.getAddress();
-                        userCity = user.getCity();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(InvitationActivity.this, "users query didnt work", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     @Override
@@ -166,7 +147,7 @@ public class InvitationActivity extends AppCompatActivity {
                     key = dateFrormatFB+timeFormatStart;
                     ic = new InviteClass(Uid, userName, userAddress, userCity, dateFormat, timeFormatStart, key,
                             level1, level2, level3, level4, level5, distance);
-                    refInvites.child(Uid).child(dateFrormatFB+timeFormatStart).setValue(ic);
+                    refInvites.child(Uid).child(key).setValue(ic);
                     Intent si = new Intent(this, MainActivity.class);
                     //si.putExtra("date format", dateFrormatFB);
                     startActivity(si);

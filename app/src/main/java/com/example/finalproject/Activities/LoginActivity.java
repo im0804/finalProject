@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     CheckBox conCB;
     TextView regorlogTV, regTV;
     Button logorregBTN;
-    public static String Uid;
+    public static String Uid ="";
     public static FirebaseUser userFB;
     boolean stayConnected, registered;
 
@@ -75,6 +75,8 @@ public class LoginActivity extends AppCompatActivity {
             userFB = mAuth.getCurrentUser();
             stayConnected = true;
             registered = true;
+            userFB = mAuth.getCurrentUser();
+            Uid = userFB.getUid();
             startActivity(si);
         }
     }

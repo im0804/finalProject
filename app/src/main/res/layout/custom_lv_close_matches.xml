@@ -61,17 +61,5 @@
     <Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="10" />
-
-    <Button
-        android:id="@+id/scoreBTN"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="30"
-        android:text="enter score" />
-
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
         android:layout_weight="5" />
 </LinearLayout>
