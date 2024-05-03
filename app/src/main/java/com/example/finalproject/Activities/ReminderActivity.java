@@ -46,6 +46,8 @@ public class ReminderActivity extends AppCompatActivity {
     boolean allGood = false, finishBTN = false, isEmpty = false;
     int counter = 0, player1Sets=0, player2Sets=0;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,8 +114,8 @@ public class ReminderActivity extends AppCompatActivity {
         }
         if (score.size() == 1) {
             if (checkScore(set21ET, set22ET)){
-                score.add(set21ET.getText().toString() + " : " + set22ET.getText().toString());
                 if (!isEmpty) {
+                    score.add(set21ET.getText().toString() + " : " + set22ET.getText().toString());
                     if (Integer.parseInt(set21ET.getText().toString()) - Integer.parseInt(set22ET.getText().toString()) > 0) {
                         player1Sets++;
                     } else {
@@ -124,8 +126,8 @@ public class ReminderActivity extends AppCompatActivity {
         }
         if (score.size() == 2) {
             if (checkScore(set31ET, set32ET)){
-                score.add(set31ET.getText().toString() + " : " + set32ET.getText().toString());
                 if (!isEmpty) {
+                    score.add(set31ET.getText().toString() + " : " + set32ET.getText().toString());
                     if (Integer.parseInt(set31ET.getText().toString()) - Integer.parseInt(set32ET.getText().toString()) > 0) {
                         player1Sets++;
                     } else {
@@ -136,8 +138,8 @@ public class ReminderActivity extends AppCompatActivity {
         }
         if (score.size() == 3) {
             if (checkScore(set41ET, set42ET)){
-                score.add(set41ET.getText().toString() + " : " + set42ET.getText().toString());
                 if (!isEmpty) {
+                    score.add(set41ET.getText().toString() + " : " + set42ET.getText().toString());
                     if (Integer.parseInt(set41ET.getText().toString()) - Integer.parseInt(set42ET.getText().toString()) > 0) {
                         player1Sets++;
                     } else {
@@ -148,8 +150,8 @@ public class ReminderActivity extends AppCompatActivity {
         }
         if (score.size() == 4) {
             if (checkScore(set51ET, set52ET)) {
-                score.add(set51ET.getText().toString() + " : " + set52ET.getText().toString());
                 if (!isEmpty) {
+                    score.add(set51ET.getText().toString() + " : " + set52ET.getText().toString());
                     if (Integer.parseInt(set51ET.getText().toString()) - Integer.parseInt(set52ET.getText().toString()) > 0) {
                         player1Sets++;
                     } else {

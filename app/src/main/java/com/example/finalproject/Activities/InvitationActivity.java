@@ -47,8 +47,9 @@ public class InvitationActivity extends AppCompatActivity {
     int distance, year, month, day;
     boolean level1, level2, level3, level4, level5;
     InviteClass ic;
-    UsersClass user;
     boolean dateChoose = false, startButton = false, validDate = true, validTime = true;
+    Intent gi;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,7 @@ public class InvitationActivity extends AppCompatActivity {
         dateTV = (TextView) findViewById(R.id.dateTV);
 
         calNow = Calendar.getInstance();
+        gi = getIntent();
 
     }
 
@@ -148,9 +150,8 @@ public class InvitationActivity extends AppCompatActivity {
                     ic = new InviteClass(Uid, userName, userAddress, userCity, dateFormat, timeFormatStart, key,
                             level1, level2, level3, level4, level5, distance);
                     refInvites.child(Uid).child(key).setValue(ic);
-                    Intent si = new Intent(this, MainActivity.class);
-                    //si.putExtra("date format", dateFrormatFB);
-                    startActivity(si);
+                    setResult(RESULT_OK, gi);
+                    finish();
                 }
                 else Toast.makeText(this, "please enter distance", Toast.LENGTH_LONG).show();
             }

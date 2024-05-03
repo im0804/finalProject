@@ -1,5 +1,9 @@
 package com.example.finalproject.Objs;
 
+import android.location.Location;
+
+import java.util.Locale;
+
 public class UsersClass {
     private String Uid;
     private String fullName;
@@ -8,7 +12,9 @@ public class UsersClass {
     private String gender;
     private int level;
     private int ratingLevel;
-    private String address;
+    private String addressName;
+    private double addLatitude;
+    private double addLongitude;
     private String city;
     private int yearsOfPlay;
     private int distance;
@@ -16,7 +22,7 @@ public class UsersClass {
     private CoachUserClass userCoach;
 
     public UsersClass(){}
-    public UsersClass(String uid, String fullName, String userName, int age, String gender, String address, String city, int level, int ratingLevel, int yearsOfPlay, int distance) {
+    public UsersClass(String uid, String fullName, String userName, int age, String gender, String addressName,double addLatitude, double addLongitude, String city, int level, int ratingLevel, int yearsOfPlay, int distance) {
         this.Uid = uid;
         this.fullName = fullName;
         this.userName = userName;
@@ -25,7 +31,9 @@ public class UsersClass {
         this.level = level;
         this.ratingLevel = ratingLevel;
         this.city = city;
-        this.address = address;
+        this.addressName = addressName;
+        this.addLatitude = addLatitude;
+        this.addLongitude = addLongitude;
         this.yearsOfPlay = yearsOfPlay;
         this.distance = distance;
         this.isCoach = false;
@@ -39,7 +47,8 @@ public class UsersClass {
         this.level = user.level;
         this.ratingLevel = user.ratingLevel;
         this.city = user.city;
-        this.address = user.address;
+        this.addressName = user.addressName;
+        //this.addressLocation = user.addressLocation;
         this.yearsOfPlay = user.yearsOfPlay;
         this.distance = user.distance;
         this.isCoach = true;
@@ -88,6 +97,30 @@ public class UsersClass {
         this.gender = gender;
     }
 
+    public String getAddressName() {
+        return addressName;
+    }
+
+    public void setAddressName(String addressName) {
+        this.addressName = addressName;
+    }
+
+    public double getAddLatitude() {
+        return addLatitude;
+    }
+
+    public void setAddLatitude(double addLatitude) {
+        this.addLatitude = addLatitude;
+    }
+
+    public double getAddLongitude() {
+        return addLongitude;
+    }
+
+    public void setAddLongitude(double addLongitude) {
+        this.addLongitude = addLongitude;
+    }
+
     public int getLevel() {
         return level;
     }
@@ -104,13 +137,7 @@ public class UsersClass {
         this.ratingLevel = ratingLevel;
     }
 
-    public String getAddress() {
-        return address;
-    }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
     public int getYearsOfPlay() {
         return yearsOfPlay;

@@ -24,6 +24,13 @@
             android:text="user1 vs user2" />
 
         <TextView
+            android:id="@+id/tvWinner"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10"
+            android:text="winner" />
+
+        <TextView
             android:id="@+id/tvScore"
             android:layout_width="match_parent"
             android:layout_height="0dp"

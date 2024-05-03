@@ -1,8 +1,11 @@
 package com.example.finalproject;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import static com.example.finalproject.ReferencesFB.*;
 import static com.example.finalproject.Activities.LoginActivity.userFB;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -11,15 +14,21 @@ import androidx.core.content.ContextCompat;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,8 +45,18 @@ import com.example.finalproject.Activities.LoginActivity;
 import com.example.finalproject.Activities.MainActivity;
 import com.example.finalproject.Activities.ProfileActivity;
 import com.example.finalproject.Objs.UsersClass;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
@@ -49,6 +68,9 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author		inbar menahem
@@ -64,10 +86,10 @@ public class RegisterActivity extends AppCompatActivity {
     public static UsersClass user;
     String Uid, fullName, userName, address, city, gender;
     int distance, age, yearsOfPlay, level, ratingLevel;
-    Intent si,gi;
+    double longitude, latitude;
+    Intent si, gi;
     AlertDialog.Builder adb;
     public static StorageReference imageRef;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +117,18 @@ public class RegisterActivity extends AppCompatActivity {
             gender = "Man";
         else
             gender = "Female";
+
+        Places.initialize(getApplicationContext(), "AIzaSyA2LZ1UsMgr1ODFaAcHv08S-f1FM6-9Jzo");
+
+        addressET.setFocusable(false);
+        addressET.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Place.Field> listField = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG);
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, listField).setCountry("IL").build(RegisterActivity.this);
+                startActivityForResult(intent, 100);
+            }
+        });
     }
 
     @Override
@@ -115,7 +149,7 @@ public class RegisterActivity extends AppCompatActivity {
                             distanceET.setText("" + user.getDistance());
                             ageET.setText("" + user.getAge());
                             cityET.setText(user.getCity());
-                            addressET.setText("" + user.getAddress());
+                            addressET.setText("" + user.getAddressName());
                             yearsOfPlayET.setText("" + user.getYearsOfPlay());
                             if (user.getGender() == "Female") {
                                 genderSW.setChecked(false);
@@ -146,14 +180,7 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "on cancelled", Toast.LENGTH_LONG).show();
                 }
             });
-            addressET.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    addressET.setFilters(new InputFilter[]{new CapitalizeFirstLetterInputFilter()});
-                }
-            });
         }
-        else addressET.setFilters(new InputFilter[]{new CapitalizeFirstLetterInputFilter()});
 
     }
 
@@ -164,7 +191,7 @@ public class RegisterActivity extends AppCompatActivity {
      *  @param	view
      *  @return	checks if all fields are filled. if so then it saves everything in firebase, if not then make a toast that asks the user to fill everything.
      */
-    public void next(View view) {
+    public void next(View view) throws IOException {
         if ((fullNameET.getText().toString().equals("")) || (userNameET.getText().toString().equals("")) || (ageET.getText().toString().equals("")) || (addressET.getText().toString().equals("")) || (cityET.getText().toString().equals("")) || (yearsOfPlayET.getText().toString().equals("")) || (distanceET.getText().toString().equals(""))){
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_LONG).show();
         }
@@ -192,11 +219,24 @@ public class RegisterActivity extends AppCompatActivity {
                 gender = "Male";
             }
             Uid = userFB.getUid();
-            user = new UsersClass(Uid, fullName, userName, age, gender, address, city, level, ratingLevel, yearsOfPlay, distance);
+            LatLng latlng = getLocationFromAddress(RegisterActivity.this, address);
+            user = new UsersClass(Uid, fullName, userName, age, gender, address, latlng.latitude, latlng.longitude, city, level, ratingLevel, yearsOfPlay, distance);
             refUsers.child(Uid).setValue(user);
             si = new Intent(this, MainActivity.class);
             startActivity(si);
         }
+    }
+
+    private LatLng getLocationFromAddress(Context context, String address) throws IOException {
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+
+        List<Address> addresses = geocoder.getFromLocationName(address, 1);
+        if (addresses != null && !addresses.isEmpty()) {
+            double latitude = addresses.get(0).getLatitude();
+            double longitude = addresses.get(0).getLongitude();
+            return new LatLng(latitude, longitude);
+        }
+        return null;
     }
 
     /**
@@ -307,6 +347,17 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(this, "No Image was selected", Toast.LENGTH_LONG).show();
                 }
             }
+        }
+
+        if (requestCode == 100 && resultCode == RESULT_OK){
+            Place place = Autocomplete.getPlaceFromIntent(data);
+            addressET.setText(place.getAddress());
+            latitude = place.getLatLng().latitude;
+            longitude = place.getLatLng().longitude;
+        }
+        else if(resultCode == AutocompleteActivity.RESULT_ERROR){
+            Status status = Autocomplete.getStatusFromIntent(data);
+            Toast.makeText(this, status.getStatusMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

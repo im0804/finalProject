@@ -68,7 +68,6 @@ public class CustomAdapterCM extends BaseAdapter {
             tvDate = (TextView) itemView.findViewById(R.id.DateTV1);
             tvHour = (TextView) itemView.findViewById(R.id.TimeTV1);
             tvLocation = (TextView) itemView.findViewById(R.id.LocationTV1);
-            //Button scoreBTN = (Button) itemView.findViewById(R.id.scoreBTN);
         }
     }
 }

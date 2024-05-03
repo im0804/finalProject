@@ -243,8 +243,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="10"
                     android:ems="10"
-                    android:hint="address"
-                    android:inputType="textAutoComplete|textAutoCorrect" />
+                    android:hint="address" />
 
                 <Space
                     android:layout_width="match_parent"

@@ -24,6 +24,6 @@ public class ReferencesFB {
     public static final int REQUEST_IMAGE_CAPTURE = 2;
     public static final int REQUEST_READ_EXTERNAL_STORAGE_PERMISSION = 3;
     public static final int REQUEST_PICK_IMAGE = 4;
-    public static final int REQUEST_CODE = 1;
-
+    public static final int REQUEST_CODE_REMINDER = 1;
+    public static final int REQUEST_CODE_INVITE = 2;
 }

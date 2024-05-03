@@ -1,30 +1,46 @@
 package com.example.finalproject.Activities;
 
+import static com.example.finalproject.Activities.LoginActivity.Uid;
 import static com.example.finalproject.Activities.LoginActivity.userFB;
+import static com.example.finalproject.Adapters.CustomAdapterHistory.score;
 import static com.example.finalproject.ReferencesFB.*;
 //import static com.example.finalproject.RegisterActivity.imagesRef;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.finalproject.Adapters.CustomAdapterHistory;
+import com.example.finalproject.Objs.InviteClass;
+import com.example.finalproject.Objs.MatchClass;
 import com.example.finalproject.R;
 import com.example.finalproject.RegisterActivity;
 import com.example.finalproject.Objs.UsersClass;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
@@ -34,6 +50,9 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.zip.CheckedInputStream;
+
 /**
  * @author		inbar menahem
  * @version	    1
@@ -41,16 +60,21 @@ import java.io.IOException;
  * the profile activity of the user.
  */
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener {
     TextView fullNameTV, userNameTV, distanceTV, ageTV, cityTV,genderTV, yearsOfPlayTV, yearsOfCoachingTV, coachTypeTV, coachDesTV, titleTV;
     ListView historyMatchesLV;
     ImageView pfpIV;
     LinearLayout coachLayout;
     Intent si;
-    String Uid;
     UsersClass user;
-
+    MatchClass history;
     StorageReference imageRef;
+    ArrayList<MatchClass> arrHistory;
+    CustomAdapterHistory historyCA;
+    AlertDialog.Builder adb;
+
+    public static String uid;
+
 
 
     @Override
@@ -76,49 +100,46 @@ public class ProfileActivity extends AppCompatActivity {
         coachLayout.setVisibility(coachLayout.GONE);
         titleTV = (TextView) findViewById(R.id.titleTV);
 
-        Uid = userFB.getUid();
-        imageRef = imagesRef.child(Uid);
-        Query query = refUsers
-                .orderByChild("uid")
-                .equalTo(Uid);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dS) {
-                if (dS.exists()) {
-                    for(DataSnapshot data : dS.getChildren()) {
-                        user = data.getValue(UsersClass.class);
-                        fullNameTV.setText("full name: "+'\n'+user.getFullName());
-                        userNameTV.setText("user name: "+'\n'+user.getUserName());
-                        distanceTV.setText("distance: "+'\n'+user.getDistance());
-                        ageTV.setText("age: "+user.getAge());
-                        genderTV.setText("gender: "+user.getGender());
-                        cityTV.setText("city: "+user.getCity());
-                        yearsOfPlayTV.setText("years of coaching: "+'\n'+user.getYearsOfPlay());
-                        //boolean isCoach = user.getIsCoach();
-                        try {
-                            showPhoto();
-                        }
-                        catch (IOException e) {
-                            Toast.makeText(ProfileActivity.this, "Image failed", Toast.LENGTH_LONG).show();
-                        }
-                        if (user.getIsCoach())
-                        {
-                            coachLayout.setVisibility(coachLayout.VISIBLE);
-                            coachTypeTV.setText("coach type: "+'\n'+user.getUserCoach().getCoachType());
-                            coachDesTV.setText("coach description: "+'\n'+user.getUserCoach().getDescription());
-                            yearsOfCoachingTV.setText("years of coaching: "+'\n'+user.getUserCoach().getYearsOfCoaching());
-                        }
-                        titleTV.setText(user.getUserName());
+        arrHistory = new ArrayList<MatchClass>();
+        historyCA = new CustomAdapterHistory(this, arrHistory);
+        historyMatchesLV.setAdapter(historyCA);
+        historyMatchesLV.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        historyMatchesLV.setOnItemLongClickListener(this);
+
+        //Uid = userFB.getUid();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        userProfile(Uid);
+
+    }
+
+    ValueEventListener velHistory = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            arrHistory.clear();
+            for (DataSnapshot data : snapshot.getChildren()){
+                for (DataSnapshot secChild : data.getChildren()) {
+                    history = secChild.getValue(MatchClass.class);
+                    if(history.getUidInviter().equals(uid)){
+                        arrHistory.add(history);
+                    }
+                    else if (history.getUidInvited().equals(uid)){
+                        arrHistory.add(history);
                     }
                 }
             }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(ProfileActivity.this, "on cancelled" , Toast.LENGTH_LONG).show();
-            }
-        });
+            historyCA.notifyDataSetChanged();
+        }
 
-    }
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+
+        }
+    };
 
     public void edit(View view) {
         Intent si = new Intent(this, RegisterActivity.class);
@@ -133,10 +154,10 @@ public class ProfileActivity extends AppCompatActivity {
      * @param	-
      * @return	download the uploaded photo from firebase.
      */
-    public void showPhoto() throws IOException {
+    public void showPhoto(String uid) throws IOException {
         //final ProgressDialog pd = ProgressDialog.show(this, "Image download", "downloading...", true);
 
-        final File localFile = File.createTempFile(Uid,"jpg");
+        final File localFile = File.createTempFile(uid,"jpg");
         imageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
@@ -153,6 +174,87 @@ public class ProfileActivity extends AppCompatActivity {
                 Toast.makeText(ProfileActivity.this, "Image download failed", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        adb = new AlertDialog.Builder(this);
+        adb.setCancelable(false);
+        if (arrHistory.get(position).getUidInviter().equals(Uid)){
+            adb.setTitle(arrHistory.get(position).getUserNameInvited() + "'s profile");
+            adb.setMessage("do you want to see "+ arrHistory.get(position).getUserNameInvited() + "'s profile?");
+            adb.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    userProfile(arrHistory.get(position).getUidInvited());
+                    dialog.cancel();
+                }
+            });
+            adb.setNegativeButton("no", new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+        }
+        else {
+            adb.setTitle(arrHistory.get(position).getUserNameInviter() + "'s profile");
+            adb.setMessage("do you want to see "+ arrHistory.get(position).getUserNameInviter() + "'s profile?");
+            adb.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    userProfile(arrHistory.get(position).getUidInviter());
+                    dialog.cancel();
+                }
+            });
+            adb.setNegativeButton("no", new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+        }
+        AlertDialog ad = adb.create();
+        ad.show();
+        return true;
+    }
+    public void userProfile(String id){
+        uid = id;
+        imageRef = imagesRef.child(uid);
+        refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> tsk) {
+                if (tsk.isSuccessful()) {
+                    DataSnapshot dS = tsk.getResult();
+                    for (DataSnapshot data : dS.getChildren()) {
+                        user = data.getValue(UsersClass.class);
+                        if (user.getUid().equals(uid)) {
+                            fullNameTV.setText("full name: " + '\n' + user.getFullName());
+                            userNameTV.setText("user name: " + '\n' + user.getUserName());
+                            distanceTV.setText("distance: " + '\n' + user.getDistance());
+                            ageTV.setText("age: " + user.getAge());
+                            genderTV.setText("gender: " + user.getGender());
+                            cityTV.setText("city: " + user.getCity());
+                            yearsOfPlayTV.setText("years of coaching: " + '\n' + user.getYearsOfPlay());
+                            //boolean isCoach = user.getIsCoach();
+                            try {
+                                showPhoto(uid);
+                            } catch (IOException e) {
+                                Toast.makeText(ProfileActivity.this, "Image failed", Toast.LENGTH_LONG).show();
+                            }
+                            if (user.getIsCoach()) {
+                                coachLayout.setVisibility(coachLayout.VISIBLE);
+                                coachTypeTV.setText("coach type: " + '\n' + user.getUserCoach().getCoachType());
+                                coachDesTV.setText("coach description: " + '\n' + user.getUserCoach().getDescription());
+                                yearsOfCoachingTV.setText("years of coaching: " + '\n' + user.getUserCoach().getYearsOfCoaching());
+                            }
+                            titleTV.setText(user.getUserName());
+                        }
+                    }
+                }
+            }
+        });
+        refPlayed.addValueEventListener(velHistory);
     }
 
     @Override
@@ -174,6 +276,8 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(si);
         }
         else if (str.equals("profile")){
+            Intent si = new Intent(this, ProfileActivity.class);
+            startActivity(si);
         }
         else if (str.equals("coach profile")){
             Intent si = new Intent(this, CoachActivity.class);
