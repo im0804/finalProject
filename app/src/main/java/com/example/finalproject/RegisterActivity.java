@@ -79,12 +79,12 @@ import java.util.Locale;
  * the register activity for the user to open an account.
  */
 public class RegisterActivity extends AppCompatActivity {
-    EditText fullNameET, userNameET, distanceET, ageET, addressET, cityET, yearsOfPlayET;
+    EditText fullNameET, userNameET, distanceET, ageET, addressET, yearsOfPlayET;
     Switch genderSW;
     ImageButton pfpIB;
     RadioButton begRB, amRB, advRB, tourRB;
     public static UsersClass user;
-    String Uid, fullName, userName, address, city, gender;
+    String Uid, fullName, userName, address, city, gender, addresToConvert;
     int distance, age, yearsOfPlay, level, ratingLevel;
     double longitude, latitude;
     Intent si, gi;
@@ -99,7 +99,6 @@ public class RegisterActivity extends AppCompatActivity {
         userNameET = (EditText) findViewById(R.id.userNameET);
         distanceET = (EditText) findViewById(R.id.distanceET);
         ageET = (EditText) findViewById(R.id.ageET);
-        cityET = (EditText) findViewById(R.id.cityET);
         addressET = (EditText) findViewById(R.id.addressET);
         yearsOfPlayET = (EditText) findViewById(R.id.yearsOfPlayET);
         genderSW = (Switch) findViewById(R.id.genderSW);
@@ -148,7 +147,6 @@ public class RegisterActivity extends AppCompatActivity {
                             userNameET.setText(user.getUserName());
                             distanceET.setText("" + user.getDistance());
                             ageET.setText("" + user.getAge());
-                            cityET.setText(user.getCity());
                             addressET.setText("" + user.getAddressName());
                             yearsOfPlayET.setText("" + user.getYearsOfPlay());
                             if (user.getGender() == "Female") {
@@ -192,7 +190,7 @@ public class RegisterActivity extends AppCompatActivity {
      *  @return	checks if all fields are filled. if so then it saves everything in firebase, if not then make a toast that asks the user to fill everything.
      */
     public void next(View view) throws IOException {
-        if ((fullNameET.getText().toString().equals("")) || (userNameET.getText().toString().equals("")) || (ageET.getText().toString().equals("")) || (addressET.getText().toString().equals("")) || (cityET.getText().toString().equals("")) || (yearsOfPlayET.getText().toString().equals("")) || (distanceET.getText().toString().equals(""))){
+        if ((fullNameET.getText().toString().equals("")) || (userNameET.getText().toString().equals("")) || (ageET.getText().toString().equals("")) || (addressET.getText().toString().equals("")) || (yearsOfPlayET.getText().toString().equals("")) || (distanceET.getText().toString().equals(""))){
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_LONG).show();
         }
         else{
@@ -200,7 +198,6 @@ public class RegisterActivity extends AppCompatActivity {
             userName = userNameET.getText().toString();
             distance = Integer.parseInt(distanceET.getText().toString());
             age = Integer.parseInt(ageET.getText().toString());
-            city = cityET.getText().toString();
             address = addressET.getText().toString();
             yearsOfPlay = Integer.parseInt(yearsOfPlayET.getText().toString());
             if (begRB.isChecked()){
@@ -219,7 +216,7 @@ public class RegisterActivity extends AppCompatActivity {
                 gender = "Male";
             }
             Uid = userFB.getUid();
-            LatLng latlng = getLocationFromAddress(RegisterActivity.this, address);
+            LatLng latlng = getLocationFromAddress(RegisterActivity.this, addresToConvert);
             user = new UsersClass(Uid, fullName, userName, age, gender, address, latlng.latitude, latlng.longitude, city, level, ratingLevel, yearsOfPlay, distance);
             refUsers.child(Uid).setValue(user);
             si = new Intent(this, MainActivity.class);
@@ -230,7 +227,7 @@ public class RegisterActivity extends AppCompatActivity {
     private LatLng getLocationFromAddress(Context context, String address) throws IOException {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
 
-        List<Address> addresses = geocoder.getFromLocationName(address, 1);
+        List<Address> addresses = geocoder.getFromLocationName(address+", "+city, 1);
         if (addresses != null && !addresses.isEmpty()) {
             double latitude = addresses.get(0).getLatitude();
             double longitude = addresses.get(0).getLongitude();
@@ -351,7 +348,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         if (requestCode == 100 && resultCode == RESULT_OK){
             Place place = Autocomplete.getPlaceFromIntent(data);
-            addressET.setText(place.getAddress());
+            addresToConvert = place.getAddress();
+            getAddressWithoutCityCountry(place);
             latitude = place.getLatLng().latitude;
             longitude = place.getLatLng().longitude;
         }
@@ -359,6 +357,13 @@ public class RegisterActivity extends AppCompatActivity {
             Status status = Autocomplete.getStatusFromIntent(data);
             Toast.makeText(this, status.getStatusMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void getAddressWithoutCityCountry(Place place) {
+        // Splitting the address by comma and returning the first part (street address)
+        String[] addressParts = place.getAddress().split(", ");
+        city = addressParts[addressParts.length - 2];
+        addressET.setText(addressParts[0]);
     }
 
     @Override

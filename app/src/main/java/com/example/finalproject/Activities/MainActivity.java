@@ -1,12 +1,16 @@
 package com.example.finalproject.Activities;
 
 import static com.example.finalproject.Activities.LoginActivity.Uid;
+import static com.example.finalproject.RegisterActivity.user;
 import static com.example.finalproject.ReferencesFB.REQUEST_CODE_INVITE;
 import static com.example.finalproject.ReferencesFB.REQUEST_CODE_REMINDER;
 import static com.example.finalproject.ReferencesFB.refInvites;
 import static com.example.finalproject.ReferencesFB.refNotPlayed;
 import static com.example.finalproject.ReferencesFB.refUsers;
+import static com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -44,6 +48,7 @@ import com.example.finalproject.RegisterActivity;
 import com.example.finalproject.Objs.UsersClass;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -51,7 +56,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -62,6 +69,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -73,7 +81,6 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, View.OnCreateContextMenuListener {
     ListView friendsSearchLV, closeMatchesLV, invitesLV, userInvitesLV;
     Intent si;
-    UsersClass user;
     InviteClass invite;
     MatchClass match;
     CustomAdapterInvites customAdapterInvites;
@@ -84,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ArrayList<UsersClass> arrUsers;
     ArrayList<String> arrAddresses;
     ArrayList<Double> arrLatlngs;
+    ArrayList<Float> arrDistance;
     ArrayList<String> arrUids;
     public static ArrayList<MatchClass> arrPassed;
     public static String userName, userCity, userAddress;
@@ -93,21 +101,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     AlertDialog.Builder adb;
 
     LocationRequest locationRequest;
-    double distance;
-    int pos,counterDP = 0;
-    boolean clicked = false;
+    FusedLocationProviderClient fusedLocationClient;
+    int pos, counterDP = 0;
 
     Calendar calNow;
     ProgressDialog pd;
     Location currentLoc = new Location("current Location");
     Location addressLoc = new Location("address Location");
-
+    CancellationTokenSource cancellationTokenSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.i("MainActivity","Activity started");
+        Log.i("MainActivity", "Activity started");
 
         //friendsSearchLV = (ListView) findViewById(R.id.friendsSearchLV);
         closeMatchesLV = (ListView) findViewById(R.id.closeMatchesLV);
@@ -119,6 +126,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(5000);
         locationRequest.setFastestInterval(2000);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+
         arrInvites = new ArrayList<InviteClass>();
         userArrInvites = new ArrayList<InviteClass>();
         arrMatches = new ArrayList<MatchClass>();
@@ -127,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         arrAddresses = new ArrayList<String>();
         arrPassed = new ArrayList<MatchClass>();
         arrLatlngs = new ArrayList<Double>();
+        arrDistance = new ArrayList<Float>();
         arrUids = new ArrayList<String>();
 
         user = new UsersClass();
@@ -147,66 +157,66 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         invitesLV.setOnItemLongClickListener(this);
         closeMatchesLV.setOnItemLongClickListener(this);
 
-        refNotPlayed.addValueEventListener(velCM);
+        cancellationTokenSource = new CancellationTokenSource();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            } else {
+                if (!isGPSEnabled()) {
+                    turnOnGPS();
+                }
+            }
+        }
 
+        refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> tsk) {
+                if (tsk.isSuccessful()) {
+                    DataSnapshot dS = tsk.getResult();
+                    for (DataSnapshot data : dS.getChildren()) {
+                        user = data.getValue(UsersClass.class);
+                        if (user.getUid().equals(Uid)) {
+                            userDis = user.getDistance() * 1000;
+                            userName = user.getUserName();
+                            userCity = user.getCity();
+                            userAddress = user.getAddressName();
+                        } else {
+                            arrUids.add(user.getUid());
+                            arrLatlngs.add(user.getAddLatitude());
+                            arrLatlngs.add(user.getAddLongitude());
+                        }
+                    }
+                } else {
+                    Log.e("Firebase Error", "Error getting data", tsk.getException());
+                }
+            }
+        });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         counterDP = 0;
-        pd = ProgressDialog.show(this,"downloading data","downloading... \n it might take a minute",true);
+        pd = ProgressDialog.show(this, "downloading data", "downloading... \n it might take a minute", true);
 
-        refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> tsk) {
-                if (tsk.isSuccessful()){
-                    DataSnapshot dS = tsk.getResult();
-                    for (DataSnapshot data : dS.getChildren()) {
-                        user = data.getValue(UsersClass.class);
-                        if (user.getUid().equals(Uid)){
-                            userDis = user.getDistance() * 1000;
-                            userName = user.getUserName();
-                            userCity = user.getCity();
-                            userAddress = user.getAddressName();
-                        }
-                        else {
-                            arrUids.add(user.getUid());
-                            arrLatlngs.add(user.getAddLatitude());
-                            arrLatlngs.add(user.getAddLongitude());
-                        }
-                    }
-                }
-                else {
-                    Log.e("Firebase Error", "Error getting data", tsk.getException());
-                }
-            }
-        });
-
-        getCurrentLocation();
         refInvites.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> tsk) {
-                if (tsk.isSuccessful()){
+                if (tsk.isSuccessful()) {
                     DataSnapshot dS = tsk.getResult();
                     arrInvites.clear();
                     userArrInvites.clear();
                     calNow = Calendar.getInstance();
-                    for (DataSnapshot data : dS.getChildren()){
+                    for (DataSnapshot data : dS.getChildren()) {
                         for (DataSnapshot secChild : data.getChildren()) {
                             invite = secChild.getValue(InviteClass.class);
-                            if(!passedDate(invite.getKey(), calNow)){
-                                if (Uid.equals(invite.getUid())){
+                            if (!passedDate(invite.getKey(), calNow)) {
+                                if (Uid.equals(invite.getUid())) {
                                     userArrInvites.add(invite);
+                                } else {
+                                    arrInvites.add(invite);
                                 }
-                                else {
-                                    withinRange(currentLoc, arrLatlngs);
-                                    if (arrUids.contains(invite.getUid())) {
-                                        arrInvites.add(invite);
-                                    }
-                                }
-                            }
-                            else {
+                            } else {
                                 refInvites.child(invite.getUid())
                                         .child(invite.getKey())
                                         .removeValue();
@@ -215,43 +225,71 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     customAdapterUserInvites.notifyDataSetChanged();
                     customAdapterInvites.notifyDataSetChanged();
+                    pd.dismiss();
+
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken());
+                    currentLocationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            currentLoc.setLatitude(location.getLatitude());
+                            currentLoc.setLongitude(location.getLongitude());
+                            Log.i("main location", location.getLatitude()+"");
+                            Log.i("main location", location.getLongitude()+"");
+                            for (int i = 0; i < arrInvites.size(); i++) {
+                                withinRange(currentLoc, arrLatlngs);
+                            }
+                            customAdapterInvites.notifyDataSetChanged();
+                        }
+                    });
                 }
             }
         });
-        pd.dismiss();
-    }
 
-    ValueEventListener velCM = new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot snapshot) {
-            pd = ProgressDialog.show(MainActivity.this,"downloading data","downloading... \n it might take a minute",true);
-            arrMatches.clear();
-            counterDP = 0;
-            calNow = Calendar.getInstance();
-            for (DataSnapshot data : snapshot.getChildren()) {
-                for (DataSnapshot secChild : data.getChildren()) {
-                    match = secChild.getValue(MatchClass.class);
-                    if (!passedDate(match.getKey(), calNow)) {
-                        if (Uid.equals(match.getUidInvited()))
-                            arrMatches.add(match);
-                        if (Uid.equals(match.getUidInviter()))
-                            arrMatches.add(match);
-                    } else{
-                        counterDP++;
-                        arrPassed.add(match);
+        refNotPlayed.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (task.isSuccessful()){
+                    DataSnapshot snapshot = task.getResult();
+                    pd = ProgressDialog.show(MainActivity.this,"downloading data","downloading... \n it might take a minute",true);
+                    arrMatches.clear();
+                    counterDP = 0;
+                    calNow = Calendar.getInstance();
+                    for (DataSnapshot data : snapshot.getChildren()) {
+                        for (DataSnapshot secChild : data.getChildren()) {
+                            match = secChild.getValue(MatchClass.class);
+                            if (!passedDate(match.getKey(), calNow)) {
+                                if (Uid.equals(match.getUidInvited()))
+                                    arrMatches.add(match);
+                                if (Uid.equals(match.getUidInviter()))
+                                    arrMatches.add(match);
+                            } else{
+                                counterDP++;
+                                arrPassed.add(match);
+                            }
+                        }
                     }
+                    customAdapterCM.notifyDataSetChanged();
+                    pd.dismiss();
+
+                    for (int i = 0; i < arrMatches.size(); i++){
+                        if (passedDate(arrMatches.get(i).getKey(), calNow)) {
+                            counterDP++;
+                            arrPassed.add(arrMatches.get(i));
+                            arrMatches.remove(i);
+                        }
+                    }
+                    btnReminder.setText(""+counterDP);
+                    customAdapterCM.notifyDataSetChanged();
+                    pd.dismiss();
                 }
             }
-            customAdapterCM.notifyDataSetChanged();
-            btnReminder.setText(""+counterDP);
-            pd.dismiss();
-        }
+        });
 
-        @Override
-        public void onCancelled(@NonNull DatabaseError error) {
-        }
-
-    };
+        pd.dismiss();
+    }
 
     public boolean passedDate(String dateString, Calendar calNow) {
         long end = calNow.getTimeInMillis();
@@ -277,39 +315,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         for (int i = 0; i<arrLatlngs.size(); i+=2){
             addressLoc.setLatitude(arrLatlngs.get(i));
             addressLoc.setLongitude(arrLatlngs.get(i+1));
-            if (currentLocation.distanceTo(addressLoc) > distance){
-                arrUids.remove(i);
-            }
-        }
-    }
-
-    public void getCurrentLocation() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                if (isGPSEnabled()) {
-                    LocationServices.getFusedLocationProviderClient(MainActivity.this)
-                            .requestLocationUpdates(locationRequest, new LocationCallback() {
-                                @Override
-                                public void onLocationResult(@NonNull LocationResult locationResult) {
-                                    super.onLocationResult(locationResult);
-                                    LocationServices.getFusedLocationProviderClient(MainActivity.this)
-                                            .removeLocationUpdates(this);
-                                    if (locationResult != null && locationResult.getLocations().size() >0){
-                                        int index = locationResult.getLocations().size() - 1;
-                                        double latitude = locationResult.getLocations().get(index).getLatitude();
-                                        double longitude = locationResult.getLocations().get(index).getLongitude();
-                                        currentLoc.setLongitude(longitude);
-                                        currentLoc.setLatitude(latitude);
-                                    }
-                                }
-                            }, Looper.getMainLooper());
-                }
-                else {
-                    turnOnGPS();
+            Log.i("distance: ", currentLocation.distanceTo(addressLoc)+"");
+            if (currentLocation.distanceTo(addressLoc) > userDis){
+                Iterator<InviteClass> iterator = arrInvites.iterator();
+                while (iterator.hasNext()) {
+                    invite = iterator.next();
+                    if (invite.getUid().equals(arrUids.get(i))) {
+                        iterator.remove();
+                    }
                 }
             }
             else {
-                requestPermissions(new String[]{ android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                arrDistance.add(currentLocation.distanceTo(addressLoc));
             }
         }
     }
@@ -448,11 +465,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             });
         }
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        refNotPlayed.removeEventListener(velCM);}
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

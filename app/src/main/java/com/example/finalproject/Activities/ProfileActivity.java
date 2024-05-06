@@ -1,7 +1,7 @@
 package com.example.finalproject.Activities;
 
 import static com.example.finalproject.Activities.LoginActivity.Uid;
-import static com.example.finalproject.Activities.LoginActivity.userFB;
+import static com.example.finalproject.RegisterActivity.user;
 import static com.example.finalproject.Adapters.CustomAdapterHistory.score;
 import static com.example.finalproject.ReferencesFB.*;
 //import static com.example.finalproject.RegisterActivity.imagesRef;
@@ -66,7 +66,6 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     ImageView pfpIV;
     LinearLayout coachLayout;
     Intent si;
-    UsersClass user;
     MatchClass history;
     StorageReference imageRef;
     ArrayList<MatchClass> arrHistory;
