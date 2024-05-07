@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.ProfileActivity">
+    tools:context=".Activities.ProfileActivity"
+    android:layoutDirection="ltr">
 
     <Space
         android:layout_width="0dp"
@@ -107,18 +108,16 @@
                     android:id="@+id/pfpIV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="30" />
-
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="30" />
+                    android:layout_weight="35"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    android:rotation="90"/>
 
                 <Button
                     android:id="@+id/button6"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="15"
+                    android:layout_weight="10"
                     android:onClick="edit"
                     android:text="edit profile" />
 

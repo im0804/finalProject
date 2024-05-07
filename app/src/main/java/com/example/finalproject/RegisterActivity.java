@@ -1,6 +1,7 @@
 package com.example.finalproject;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+import static com.example.finalproject.Activities.LoginActivity.Uid;
 import static com.example.finalproject.ReferencesFB.*;
 import static com.example.finalproject.Activities.LoginActivity.userFB;
 
@@ -35,6 +36,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -84,7 +86,7 @@ public class RegisterActivity extends AppCompatActivity {
     ImageButton pfpIB;
     RadioButton begRB, amRB, advRB, tourRB;
     public static UsersClass user;
-    String Uid, fullName, userName, address, city, gender, addresToConvert;
+    String fullName, userName, address, city, gender, addresToConvert;
     int distance, age, yearsOfPlay, level, ratingLevel;
     double longitude, latitude;
     Intent si, gi;
@@ -109,7 +111,6 @@ public class RegisterActivity extends AppCompatActivity {
         tourRB = (RadioButton) findViewById(R.id.tourRB);
 
         gi = getIntent();
-        Uid = userFB.getUid();
         imageRef = imagesRef.child(Uid);
 
         if (genderSW.isChecked())
@@ -395,23 +396,24 @@ public class RegisterActivity extends AppCompatActivity {
      * @return	download the uploaded photo from firebase.
      */
     public void showPhoto() throws IOException {
-        final ProgressDialog pd = ProgressDialog.show(this, "Image download", "downloading...", true);
+        final ProgressDialog pd = ProgressDialog.show(RegisterActivity.this, "Image download", "downloading...", true);
+        pd.setCancelable(false);
 
         final File localFile = File.createTempFile(Uid,"jpeg");
         imageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                pd.dismiss();
                 Toast.makeText(RegisterActivity.this, "Image download success", Toast.LENGTH_LONG).show();
                 String filePath = localFile.getPath();
                 Bitmap bitmap = BitmapFactory.decodeFile(filePath);
                 pfpIB.setImageBitmap(bitmap);
+                pd.dismiss();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                pd.dismiss();
                 Toast.makeText(RegisterActivity.this, "Image download failed", Toast.LENGTH_LONG).show();
+                pd.dismiss();
             }
         });
     }

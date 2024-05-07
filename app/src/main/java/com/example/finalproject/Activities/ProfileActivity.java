@@ -12,10 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -71,9 +74,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     ArrayList<MatchClass> arrHistory;
     CustomAdapterHistory historyCA;
     AlertDialog.Builder adb;
-
-    public static String uid;
-
+    ProgressDialog pd;
 
 
     @Override
@@ -105,8 +106,11 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         historyMatchesLV.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         historyMatchesLV.setOnItemLongClickListener(this);
 
-        //Uid = userFB.getUid();
-
+        pd = new ProgressDialog(ProfileActivity.this);
+        pd.setTitle("image download");
+        pd.setMessage("loading...");
+        pd.setCancelable(false);
+        pd.show();
     }
 
     @Override
@@ -123,10 +127,10 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
             for (DataSnapshot data : snapshot.getChildren()){
                 for (DataSnapshot secChild : data.getChildren()) {
                     history = secChild.getValue(MatchClass.class);
-                    if(history.getUidInviter().equals(uid)){
+                    if(history.getUidInviter().equals(Uid)){
                         arrHistory.add(history);
                     }
-                    else if (history.getUidInvited().equals(uid)){
+                    else if (history.getUidInvited().equals(Uid)){
                         arrHistory.add(history);
                     }
                 }
@@ -153,23 +157,21 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
      * @param	-
      * @return	download the uploaded photo from firebase.
      */
-    public void showPhoto(String uid) throws IOException {
-        //final ProgressDialog pd = ProgressDialog.show(this, "Image download", "downloading...", true);
-
-        final File localFile = File.createTempFile(uid,"jpg");
+    public void showPhoto() throws IOException {
+        final File localFile = File.createTempFile(Uid,"jpg");
         imageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                //pd.dismiss();
                 Toast.makeText(ProfileActivity.this, "Image download success", Toast.LENGTH_LONG).show();
                 String filePath = localFile.getPath();
                 Bitmap bitmap = BitmapFactory.decodeFile(filePath);
                 pfpIV.setImageBitmap(bitmap);
+                pd.dismiss();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                //pd.dismiss();
+                pd.dismiss();
                 Toast.makeText(ProfileActivity.this, "Image download failed", Toast.LENGTH_LONG).show();
             }
         });
@@ -218,8 +220,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         return true;
     }
     public void userProfile(String id){
-        uid = id;
-        imageRef = imagesRef.child(uid);
+        imageRef = imagesRef.child(id);
         refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> tsk) {
@@ -227,7 +228,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
                     DataSnapshot dS = tsk.getResult();
                     for (DataSnapshot data : dS.getChildren()) {
                         user = data.getValue(UsersClass.class);
-                        if (user.getUid().equals(uid)) {
+                        if (user.getUid().equals(Uid)) {
                             fullNameTV.setText("full name: " + '\n' + user.getFullName());
                             userNameTV.setText("user name: " + '\n' + user.getUserName());
                             distanceTV.setText("distance: " + '\n' + user.getDistance());
@@ -237,7 +238,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
                             yearsOfPlayTV.setText("years of coaching: " + '\n' + user.getYearsOfPlay());
                             //boolean isCoach = user.getIsCoach();
                             try {
-                                showPhoto(uid);
+                                showPhoto();
                             } catch (IOException e) {
                                 Toast.makeText(ProfileActivity.this, "Image failed", Toast.LENGTH_LONG).show();
                             }

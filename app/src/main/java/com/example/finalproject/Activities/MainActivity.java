@@ -198,7 +198,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onStart();
         counterDP = 0;
         pd = ProgressDialog.show(this, "downloading data", "downloading... \n it might take a minute", true);
-
+        pd.setCancelable(false);
+        pd.show();
         refInvites.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> tsk) {
@@ -254,6 +255,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (task.isSuccessful()){
                     DataSnapshot snapshot = task.getResult();
                     pd = ProgressDialog.show(MainActivity.this,"downloading data","downloading... \n it might take a minute",true);
+                    pd.setCancelable(false);
+                    pd.show();
                     arrMatches.clear();
                     counterDP = 0;
                     calNow = Calendar.getInstance();

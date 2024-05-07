@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity" >
+    tools:context=".RegisterActivity"
+    android:layoutDirection="ltr">
 
     <Space
         android:layout_width="0dp"
@@ -56,7 +57,9 @@
                     android:layout_height="0dp"
                     android:layout_weight="30"
                     android:onClick="pfp"
-                    android:src="@drawable/pfp" />
+                    android:src="@drawable/pfp"
+                    android:adjustViewBounds="true"
+                    android:rotation="90"/>
 
                 <Space
                     android:layout_width="match_parent"
