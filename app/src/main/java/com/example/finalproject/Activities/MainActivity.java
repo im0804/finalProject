@@ -1,16 +1,9 @@
 package com.example.finalproject.Activities;
 
-import static com.example.finalproject.Activities.LoginActivity.Uid;
-import static com.example.finalproject.RegisterActivity.user;
-import static com.example.finalproject.ReferencesFB.REQUEST_CODE_INVITE;
-import static com.example.finalproject.ReferencesFB.REQUEST_CODE_REMINDER;
-import static com.example.finalproject.ReferencesFB.refInvites;
-import static com.example.finalproject.ReferencesFB.refNotPlayed;
-import static com.example.finalproject.ReferencesFB.refUsers;
+import static com.example.finalproject.ReferencesFB.*;
 import static com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -18,11 +11,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -44,14 +37,12 @@ import com.example.finalproject.Adapters.CustomAdapterUserInvites;
 import com.example.finalproject.Objs.InviteClass;
 import com.example.finalproject.Objs.MatchClass;
 import com.example.finalproject.R;
-import com.example.finalproject.RegisterActivity;
+import com.example.finalproject.ReferencesFB;
 import com.example.finalproject.Objs.UsersClass;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
@@ -61,8 +52,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -73,54 +62,59 @@ import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author inbar menahem
- * @version 1
- * @since 24/12/2023
- * the main activity for the user.
+ * created by Inbar Menahem on 24/12/2023
+ * Main Activity
+ * <p>
+ * display invites, user invite and close matches
  */
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, View.OnCreateContextMenuListener {
-    ListView friendsSearchLV, closeMatchesLV, invitesLV, userInvitesLV;
-    Intent si;
+    private ListView invitesLV, userInvitesLV, closeMatchesLV;
+    private Button btnReminder, btnAddInvite;
+
+    int pos, counterDP = 0;
+
+    UsersClass user;
     InviteClass invite;
     MatchClass match;
+
+    Intent si;
+    AlertDialog.Builder adb;
+    Calendar calNow;
+    ProgressDialog pd;
+
     CustomAdapterInvites customAdapterInvites;
     CustomAdapterUserInvites customAdapterUserInvites;
     CustomAdapterCM customAdapterCM;
+
     ArrayList<InviteClass> arrInvites, userArrInvites;
     ArrayList<MatchClass> arrMatches, arrHistory;
-    ArrayList<UsersClass> arrUsers;
     ArrayList<String> arrAddresses;
     ArrayList<Double> arrLatlngs;
     ArrayList<Float> arrDistance;
     ArrayList<String> arrUids;
-    public static ArrayList<MatchClass> arrPassed;
-    public static String userName, userCity, userAddress;
-    public static int userDis = 0;
-    Button btnReminder;
-
-    AlertDialog.Builder adb;
 
     LocationRequest locationRequest;
     FusedLocationProviderClient fusedLocationClient;
-    int pos, counterDP = 0;
-
-    Calendar calNow;
-    ProgressDialog pd;
-    Location currentLoc = new Location("current Location");
     Location addressLoc = new Location("address Location");
     CancellationTokenSource cancellationTokenSource;
+    Task<Location> currentLocationTask;
+
+    public static ArrayList<MatchClass> arrPassed;
+    public static String userName, userCity, userAddress;
+    public static int userDis = 0;
+    public static UsersClass currentUser;
+    public static Location currentLoc = new Location("current Location");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.i("MainActivity", "Activity started");
 
-        //friendsSearchLV = (ListView) findViewById(R.id.friendsSearchLV);
         closeMatchesLV = (ListView) findViewById(R.id.closeMatchesLV);
         invitesLV = (ListView) findViewById(R.id.invitesLV);
         userInvitesLV = (ListView) findViewById(R.id.userInvitesLV);
         btnReminder = (Button) findViewById(R.id.btnReminder);
+        btnAddInvite = (Button) findViewById(R.id.btnAddInvite);
 
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -128,17 +122,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         locationRequest.setFastestInterval(2000);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
 
+        btnAddInvite.setBackgroundColor(Color.TRANSPARENT);
+        btnReminder.setBackgroundColor(Color.TRANSPARENT);
+
         arrInvites = new ArrayList<InviteClass>();
         userArrInvites = new ArrayList<InviteClass>();
         arrMatches = new ArrayList<MatchClass>();
         arrHistory = new ArrayList<MatchClass>();
-        arrUsers = new ArrayList<UsersClass>();
         arrAddresses = new ArrayList<String>();
         arrPassed = new ArrayList<MatchClass>();
         arrLatlngs = new ArrayList<Double>();
         arrDistance = new ArrayList<Float>();
         arrUids = new ArrayList<String>();
 
+        ReferencesFB.getUser(mAuth.getCurrentUser());
         user = new UsersClass();
 
         customAdapterInvites = new CustomAdapterInvites(MainActivity.this, arrInvites);
@@ -157,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         invitesLV.setOnItemLongClickListener(this);
         closeMatchesLV.setOnItemLongClickListener(this);
 
+        // Location permissions
         cancellationTokenSource = new CancellationTokenSource();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -168,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         }
 
+        // reading user information from database
         refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> tsk) {
@@ -180,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             userName = user.getUserName();
                             userCity = user.getCity();
                             userAddress = user.getAddressName();
+                            currentUser = user;
                         } else {
                             arrUids.add(user.getUid());
                             arrLatlngs.add(user.getAddLatitude());
@@ -197,9 +197,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onStart() {
         super.onStart();
         counterDP = 0;
-        pd = ProgressDialog.show(this, "downloading data", "downloading... \n it might take a minute", true);
-        pd.setCancelable(false);
-        pd.show();
+        // reading invites from database
         refInvites.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> tsk) {
@@ -226,12 +224,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     customAdapterUserInvites.notifyDataSetChanged();
                     customAdapterInvites.notifyDataSetChanged();
-                    pd.dismiss();
 
+                    // sort invites by Location and distance
                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
-                    Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken());
+                    currentLocationTask = fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken());
                     currentLocationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override
                         public void onSuccess(Location location) {
@@ -249,14 +247,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+        // reading close matches from database
         refNotPlayed.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.isSuccessful()){
                     DataSnapshot snapshot = task.getResult();
-                    pd = ProgressDialog.show(MainActivity.this,"downloading data","downloading... \n it might take a minute",true);
-                    pd.setCancelable(false);
-                    pd.show();
                     arrMatches.clear();
                     counterDP = 0;
                     calNow = Calendar.getInstance();
@@ -268,15 +264,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     arrMatches.add(match);
                                 if (Uid.equals(match.getUidInviter()))
                                     arrMatches.add(match);
-                            } else{
-                                counterDP++;
-                                arrPassed.add(match);
+                            } else {
+                                if (Uid.equals(match.getUidInvited())){
+                                    counterDP++;
+                                    arrPassed.add(match);
+                                }
+
+                                if (Uid.equals(match.getUidInviter())){
+                                    counterDP++;
+                                    arrPassed.add(match);
+                                }
                             }
                         }
                     }
                     customAdapterCM.notifyDataSetChanged();
-                    pd.dismiss();
 
+                    //checks if close match date has passed
                     for (int i = 0; i < arrMatches.size(); i++){
                         if (passedDate(arrMatches.get(i).getKey(), calNow)) {
                             counterDP++;
@@ -286,14 +289,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     btnReminder.setText(""+counterDP);
                     customAdapterCM.notifyDataSetChanged();
-                    pd.dismiss();
                 }
             }
         });
-
-        pd.dismiss();
     }
 
+    /**
+     * method Passed date boolean.
+     *
+     * this method check if invitation date is before current date.
+     * @param dateString invitation date
+     * @param calNow     current date
+     *
+     */
     public boolean passedDate(String dateString, Calendar calNow) {
         long end = calNow.getTimeInMillis();
         SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyyHH:mm");
@@ -314,6 +322,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return false;
     }
 
+    /**
+     * method Within range.
+     *
+     * this method check if invites are within range of user's distance choice.
+     * @param currentLocation user's current location
+     * @param arrLatlngs      an array of addresses by latitude and longitude.
+     */
     public void withinRange(Location currentLocation, ArrayList<Double> arrLatlngs){
         for (int i = 0; i<arrLatlngs.size(); i+=2){
             addressLoc.setLatitude(arrLatlngs.get(i));
@@ -323,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Iterator<InviteClass> iterator = arrInvites.iterator();
                 while (iterator.hasNext()) {
                     invite = iterator.next();
-                    if (invite.getUid().equals(arrUids.get(i))) {
+                    if (invite.getUid().equals(arrUids.get(i/2))) {
                         iterator.remove();
                     }
                 }
@@ -409,14 +424,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     /**
      * Add a game method.
      *
+     * moves the user to Invitation Activity
      * @param view the view
-     * @return opens the invitation activity.
      */
     public void addAGame(View view) {
         si = new Intent(this, InvitationActivity.class);
         startActivityForResult(si, REQUEST_CODE_INVITE);
     }
 
+    /**
+     * Remind.
+     *
+     * moves the user to Reminder Activity
+     * @param view the view
+     */
     public void remind(View view) {
         if (counterDP == 0){
             btnReminder.setText("0");
@@ -432,12 +453,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // shows the number of passed matches.
         if (requestCode == REQUEST_CODE_REMINDER  && resultCode  == RESULT_OK) {
             counterDP--;
             btnReminder.setText(""+counterDP);
         }
 
         if (requestCode == REQUEST_CODE_INVITE && resultCode == RESULT_OK){
+
+            // reading invites from database again after an new invitation is added
             refInvites.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
                 public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> tsk) {
@@ -471,6 +495,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        //gives the user an option to join an invitation
         if (parent.getId() == R.id.invitesLV) {
             adb = new AlertDialog.Builder(this);
             adb.setTitle("find a match!");
@@ -502,11 +527,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             ad.show();
         }
 
+        // saves the chosen item so that the user can delete his invitation
         if (parent.getId() == R.id.userInvitesLV) {
             pos = position;
 
         }
 
+        //gives the user an option to delete a close match.
         if (parent.getId() == R.id.closeMatchesLV) {
             adb = new AlertDialog.Builder(this);
             adb.setTitle("delete meeting");
@@ -560,11 +587,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         String str = item.getTitle().toString();
-        if (str.equals("register")){
-            si = new Intent(this, RegisterActivity.class);
+        if (str.equals("main")){
+            Intent si = new Intent(this, MainActivity.class);
             startActivity(si);
-        }
-        else if (str.equals("main")){
         }
         else if (str.equals("profile")){
             Intent si = new Intent(this, ProfileActivity.class);
@@ -574,15 +599,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Intent si = new Intent(this, CoachActivity.class);
             startActivity(si);
         }
-        else if (str.equals("join as coach")){
-            Intent si = new Intent(this, JoinAsCoachActivity.class);
-            startActivity(si);
-        } else if (str.equals("login")) {
-            Intent si = new Intent(this, LoginActivity.class);
-            startActivity(si);
-        }
-        else if (str.equals("coachAct")) {
-            Intent si = new Intent(this, CoachActivity.class);
+        else if(str.equals("register")){
+            Intent si = new Intent(this, RegisterActivity.class);
             startActivity(si);
         }
         return super.onOptionsItemSelected(item);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="200px"
+    android:layout_height="250px"
     android:gravity="center"
     android:orientation="horizontal"
     android:layoutDirection="ltr">
@@ -22,28 +22,36 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:text="user1 vs user2" />
+            android:text="user1 vs user2"
+            android:textSize="16dp"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/tvWinner"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:text="winner" />
+            android:text="winner"
+            android:textSize="15dp"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/tvScore"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:text="score" />
+            android:text="score"
+            android:textSize="15dp"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/tvDateTime"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:text="date and time" />
+            android:text="date and time"
+            android:textSize="15dp"
+            android:textStyle="bold"/>
 
     </LinearLayout>
 

@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.CoachActivity"
-    android:layoutDirection="ltr">
+    android:layoutDirection="ltr"
+    android:background="@drawable/coaches">
 
     <Space
         android:layout_width="0dp"
@@ -23,19 +24,6 @@
             android:layout_height="0dp"
             android:layout_weight="5" />
 
-        <TextView
-            android:id="@+id/textView11"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="4"
-            android:text="search coach" />
-
-        <ListView
-            android:id="@+id/searchCoachlV"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="6" />
-
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -46,7 +34,10 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="4"
-            android:text="close coaches to you" />
+            android:text="close coaches to you"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:textColor="@color/black"/>
 
         <ListView
             android:id="@+id/closeToYouLV"
@@ -57,27 +48,29 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3" />
+            android:layout_weight="8" />
 
         <TextView
             android:id="@+id/textView13"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10"
-            android:text="are you a coach? join us!" />
+            android:layout_weight="4"
+            android:text="are you a coach? join us!"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btnJoin"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10"
-            android:text="join"
-            android:onClick="join"/>
+            android:layout_weight="8"
+            android:onClick="join" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="10" />
     </LinearLayout>
 
     <Space

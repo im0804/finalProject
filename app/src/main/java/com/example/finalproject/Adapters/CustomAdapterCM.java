@@ -54,20 +54,18 @@ public class CustomAdapterCM extends BaseAdapter {
             viewholder.tvInvitedUser.setText(arrMatches.get(position).getUserNameInvited());
             viewholder.tvDate.setText(arrMatches.get(position).getDate());
             viewholder.tvHour.setText(arrMatches.get(position).getHour());
-            //viewholder.tvLocation.setText(arrMatches.get(position).getLocation());
         }
         return view;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        TextView tvInviteUser, tvInvitedUser, tvDate, tvHour, tvLocation;
+        TextView tvInviteUser, tvInvitedUser, tvDate, tvHour;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvInviteUser = (TextView) itemView.findViewById(R.id.tvInviteUser);
             tvInvitedUser = (TextView) itemView.findViewById(R.id.tvInvitedUser);
             tvDate = (TextView) itemView.findViewById(R.id.DateTV1);
             tvHour = (TextView) itemView.findViewById(R.id.TimeTV1);
-            tvLocation = (TextView) itemView.findViewById(R.id.LocationTV1);
         }
     }
 }

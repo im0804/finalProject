@@ -1,12 +1,7 @@
-package com.example.finalproject;
+package com.example.finalproject.Activities;
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
-import static com.example.finalproject.Activities.LoginActivity.Uid;
 import static com.example.finalproject.ReferencesFB.*;
-import static com.example.finalproject.Activities.LoginActivity.userFB;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -21,43 +16,34 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.text.InputFilter;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.example.finalproject.Activities.CoachActivity;
-import com.example.finalproject.Activities.JoinAsCoachActivity;
-import com.example.finalproject.Activities.LoginActivity;
-import com.example.finalproject.Activities.MainActivity;
-import com.example.finalproject.Activities.ProfileActivity;
 import com.example.finalproject.Objs.UsersClass;
+import com.example.finalproject.R;
+import com.example.finalproject.ReferencesFB;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -75,22 +61,27 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * @author		inbar menahem
- * @version	    1
- * @since		21/12/2023
- * the register activity for the user to open an account.
+ * The type Register activity.
+ *
+ * @author inbar menahem
+ * @version 1
+ * @since 21 /12/2023 the register activity for the user to open an account.
  */
 public class RegisterActivity extends AppCompatActivity {
-    EditText fullNameET, userNameET, distanceET, ageET, addressET, yearsOfPlayET;
-    Switch genderSW;
-    ImageButton pfpIB;
-    RadioButton begRB, amRB, advRB, tourRB;
-    public static UsersClass user;
-    String fullName, userName, address, city, gender, addresToConvert;
-    int distance, age, yearsOfPlay, level, ratingLevel;
+    private EditText fullNameET, userNameET, distanceET, ageET, addressET, yearsOfPlayET;
+    private Switch genderSW;
+    private ImageButton pfpIB;
+    private Button nextBTN;
+    private RadioButton begRB, amRB, advRB, tourRB;
+
+    int distance, age, yearsOfPlay, level;
     double longitude, latitude;
+    String fullName, userName, address, city, gender, addressToConvert;
+
+    UsersClass user;
     Intent si, gi;
     AlertDialog.Builder adb;
+
     public static StorageReference imageRef;
 
     @Override
@@ -105,10 +96,13 @@ public class RegisterActivity extends AppCompatActivity {
         yearsOfPlayET = (EditText) findViewById(R.id.yearsOfPlayET);
         genderSW = (Switch) findViewById(R.id.genderSW);
         pfpIB = (ImageButton) findViewById(R.id.pfpIB);
+        nextBTN = (Button) findViewById(R.id.nextBtn);
         begRB = (RadioButton) findViewById(R.id.begRB);
         amRB = (RadioButton) findViewById(R.id.amRB);
         advRB = (RadioButton) findViewById(R.id.advRB);
         tourRB = (RadioButton) findViewById(R.id.tourRB);
+
+        nextBTN.setBackgroundColor(Color.TRANSPARENT);
 
         gi = getIntent();
         imageRef = imagesRef.child(Uid);
@@ -118,22 +112,36 @@ public class RegisterActivity extends AppCompatActivity {
         else
             gender = "Female";
 
+        // initialize the places api
         Places.initialize(getApplicationContext(), "AIzaSyA2LZ1UsMgr1ODFaAcHv08S-f1FM6-9Jzo");
 
+        // sets listener for address EditText
         addressET.setFocusable(false);
         addressET.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // opens Google Maps addresses search intent
                 List<Place.Field> listField = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG);
                 Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, listField).setCountry("IL").build(RegisterActivity.this);
                 startActivityForResult(intent, 100);
             }
         });
+
+        // check Camera permissions
+        if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{android.Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+        }
+
+        // check Gallery permissions
+        if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE_PERMISSION);
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        // check if user came from Profile Activity to change details
         if (gi.getIntExtra("from profile", -1) != -1) {
             Query query = refUsers
                     .orderByChild("uid")
@@ -176,7 +184,6 @@ public class RegisterActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Toast.makeText(RegisterActivity.this, "on cancelled", Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -184,11 +191,14 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     /**
-     * method of next button.
-     *  <p>
+     * On Click method next button.
+     * <p>
+     * this method checks if all fields are filled and valid
+     * if so, it saves the information into database
+     * after it's done, the user goes to the main activity.
      *
-     *  @param	view
-     *  @return	checks if all fields are filled. if so then it saves everything in firebase, if not then make a toast that asks the user to fill everything.
+     * @param view the view
+     * @throws IOException the io exception
      */
     public void next(View view) throws IOException {
         if ((fullNameET.getText().toString().equals("")) || (userNameET.getText().toString().equals("")) || (ageET.getText().toString().equals("")) || (addressET.getText().toString().equals("")) || (yearsOfPlayET.getText().toString().equals("")) || (distanceET.getText().toString().equals(""))){
@@ -216,9 +226,9 @@ public class RegisterActivity extends AppCompatActivity {
             else{
                 gender = "Male";
             }
-            Uid = userFB.getUid();
-            LatLng latlng = getLocationFromAddress(RegisterActivity.this, addresToConvert);
-            user = new UsersClass(Uid, fullName, userName, age, gender, address, latlng.latitude, latlng.longitude, city, level, ratingLevel, yearsOfPlay, distance);
+            ReferencesFB.getUser(mAuth.getCurrentUser());
+            LatLng latlng = getLocationFromAddress(RegisterActivity.this, addressToConvert);
+            user = new UsersClass(Uid, fullName, userName, age, gender, address, latlng.latitude, latlng.longitude, city, level, yearsOfPlay, distance);
             refUsers.child(Uid).setValue(user);
             si = new Intent(this, MainActivity.class);
             startActivity(si);
@@ -226,8 +236,8 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private LatLng getLocationFromAddress(Context context, String address) throws IOException {
+        //converting address to latitute and longitude object
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-
         List<Address> addresses = geocoder.getFromLocationName(address+", "+city, 1);
         if (addresses != null && !addresses.isEmpty()) {
             double latitude = addresses.get(0).getLatitude();
@@ -238,13 +248,13 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     /**
-     * profile photo method
+     * On Click method profile photo
      * <p>
+     *this method opens a dialog and checks if the user uploads a photo from Camera or Gallery.
+     * if the user chose Camera, it opens the Camera and upload the photo to Firebase Storage.
+     * if the user chose Gallery, it opens the Gallery and upload the photo to Firebase Storage.
      *
-     * @param	view
-     * @return	opens an alarm dialog and checks if he uploads the photo from camera or gallery.
-     *          if the user chose camera then it opens the camera and upload the photo to firebase.
-     *          if the user chose gallery then it opens the gallery and upload the photo to firebase.
+     * @param view the view
      */
     public void pfp(View view) {
         adb = new AlertDialog.Builder(this);
@@ -253,26 +263,34 @@ public class RegisterActivity extends AppCompatActivity {
         adb.setPositiveButton("camera", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                // checks if Camera permission is granted
                 if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{android.Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                 }
-                Intent takePicIntent = new Intent();
-                takePicIntent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePicIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePicIntent, REQUEST_IMAGE_CAPTURE);
+                else{
+                    //opens Camera
+                    Intent takePicIntent = new Intent();
+                    takePicIntent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePicIntent.resolveActivity(getPackageManager()) != null) {
+                        startActivityForResult(takePicIntent, REQUEST_IMAGE_CAPTURE);
+                    }
                 }
             }
         });
         adb.setNegativeButton("gallery", new DialogInterface.OnClickListener(){
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                // checks if Gallery permission is granted
                 if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE_PERMISSION);
                 }
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_PICK);
-                galleryIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(galleryIntent, REQUEST_PICK_IMAGE);
+                else {
+                    //opens Gallery
+                    Intent galleryIntent = new Intent();
+                    galleryIntent.setAction(Intent.ACTION_PICK);
+                    galleryIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(galleryIntent, REQUEST_PICK_IMAGE);
+                }
             }
         });
         AlertDialog ad = adb.create();
@@ -283,6 +301,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        // upload the taken photo to Firebase Storage
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
@@ -297,7 +316,7 @@ public class RegisterActivity extends AppCompatActivity {
                             try {
                                 showPhoto();
                             } catch (IOException e) {
-                                Toast.makeText(RegisterActivity.this, "didnt download", Toast.LENGTH_LONG).show();
+                                Toast.makeText(RegisterActivity.this, "didn't download", Toast.LENGTH_LONG).show();
                             }
                         }
                     })
@@ -307,6 +326,7 @@ public class RegisterActivity extends AppCompatActivity {
                             Toast.makeText(RegisterActivity.this, "Upload failed", Toast.LENGTH_LONG).show();
                         }
                     });
+            // upload the selected photo to Firebase Storage
         } else if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri uri = data.getData();
             try {
@@ -330,7 +350,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     try {
                                         showPhoto();
                                     } catch (IOException e) {
-                                        Toast.makeText(RegisterActivity.this, "didnt download", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(RegisterActivity.this, "didn't download", Toast.LENGTH_LONG).show();
                                     }
                                 }
                             })
@@ -341,16 +361,15 @@ public class RegisterActivity extends AppCompatActivity {
                                     Toast.makeText(RegisterActivity.this, "Upload failed", Toast.LENGTH_LONG).show();
                                 }
                             });
-                } else {
-                    Toast.makeText(this, "No Image was selected", Toast.LENGTH_LONG).show();
                 }
             }
         }
 
+        // if chosen address from intent is valid, it saves into variables
         if (requestCode == 100 && resultCode == RESULT_OK){
             Place place = Autocomplete.getPlaceFromIntent(data);
-            addresToConvert = place.getAddress();
-            getAddressWithoutCityCountry(place);
+            addressToConvert = place.getAddress();
+            getAddressWithoutCountry(place);
             latitude = place.getLatLng().latitude;
             longitude = place.getLatLng().longitude;
         }
@@ -360,8 +379,8 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    private void getAddressWithoutCityCountry(Place place) {
-        // Splitting the address by comma and returning the first part (street address)
+    private void getAddressWithoutCountry(Place place) {
+        // saving address name and city into 2 different variables
         String[] addressParts = place.getAddress().split(", ");
         city = addressParts[addressParts.length - 2];
         addressET.setText(addressParts[0]);
@@ -391,9 +410,9 @@ public class RegisterActivity extends AppCompatActivity {
     /**
      * show photo method
      * <p>
+     * this method downloads the uploaded photo from Firebase Storage and shows it to the user.
      *
-     * @param	-
-     * @return	download the uploaded photo from firebase.
+     * @throws IOException the io exception
      */
     public void showPhoto() throws IOException {
         final ProgressDialog pd = ProgressDialog.show(RegisterActivity.this, "Image download", "downloading...", true);
@@ -403,7 +422,6 @@ public class RegisterActivity extends AppCompatActivity {
         imageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(RegisterActivity.this, "Image download success", Toast.LENGTH_LONG).show();
                 String filePath = localFile.getPath();
                 Bitmap bitmap = BitmapFactory.decodeFile(filePath);
                 pfpIB.setImageBitmap(bitmap);

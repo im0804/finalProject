@@ -11,7 +11,6 @@ public class UsersClass {
     private int age;
     private String gender;
     private int level;
-    private int ratingLevel;
     private String addressName;
     private double addLatitude;
     private double addLongitude;
@@ -22,14 +21,13 @@ public class UsersClass {
     private CoachUserClass userCoach;
 
     public UsersClass(){}
-    public UsersClass(String uid, String fullName, String userName, int age, String gender, String addressName,double addLatitude, double addLongitude, String city, int level, int ratingLevel, int yearsOfPlay, int distance) {
+    public UsersClass(String uid, String fullName, String userName, int age, String gender, String addressName,double addLatitude, double addLongitude, String city, int level, int yearsOfPlay, int distance) {
         this.Uid = uid;
         this.fullName = fullName;
         this.userName = userName;
         this.age = age;
         this.gender = gender;
         this.level = level;
-        this.ratingLevel = ratingLevel;
         this.city = city;
         this.addressName = addressName;
         this.addLatitude = addLatitude;
@@ -45,7 +43,6 @@ public class UsersClass {
         this.age = user.age;
         this.gender = user.gender;
         this.level = user.level;
-        this.ratingLevel = user.ratingLevel;
         this.city = user.city;
         this.addressName = user.addressName;
         //this.addressLocation = user.addressLocation;
@@ -129,15 +126,6 @@ public class UsersClass {
         this.level = level;
     }
 
-    public int getRatingLevel() {
-        return ratingLevel;
-    }
-
-    public void setRatingLevel(int ratingLevel) {
-        this.ratingLevel = ratingLevel;
-    }
-
-
 
     public int getYearsOfPlay() {
         return yearsOfPlay;
@@ -168,13 +156,6 @@ public class UsersClass {
 
     public void setCoach(boolean coach) {
         isCoach = coach;
-    }
-    public boolean getIsCoach() {
-        return isCoach;
-    }
-
-    public void setIsCoach(boolean isCoach) {
-        this.isCoach = isCoach;
     }
 
     public CoachUserClass getUserCoach() {

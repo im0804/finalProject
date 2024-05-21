@@ -1,6 +1,5 @@
 package com.example.finalproject.Adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;

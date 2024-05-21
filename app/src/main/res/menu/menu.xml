@@ -2,11 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/register"
-        android:title="register"
-        android:orderInCategory="100" />
-
-    <item
         android:id="@+id/main"
         android:title="main"
         android:orderInCategory="200" />
@@ -22,19 +17,8 @@
         android:orderInCategory="400" />
 
     <item
-        android:id="@+id/joinAsCoach"
-        android:title="join as coach"
+        android:id="@+id/register"
+        android:title="register"
         android:orderInCategory="500" />
-
-    <item
-        android:id="@+id/login"
-        android:title="login"
-        android:orderInCategory="600" />
-
-    <item
-        android:id="@+id/coachAct"
-        android:title="coach"
-        android:orderInCategory="700" />
-
 
 </menu>

@@ -1,18 +1,16 @@
 package com.example.finalproject.Activities;
 
-import static com.example.finalproject.Activities.LoginActivity.Uid;
-import static com.example.finalproject.Activities.LoginActivity.userFB;
 import static com.example.finalproject.Activities.MainActivity.userAddress;
 import static com.example.finalproject.Activities.MainActivity.userCity;
 import static com.example.finalproject.Activities.MainActivity.userName;
 import static com.example.finalproject.ReferencesFB.*;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -36,18 +34,25 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
+/**
+ * Invitation activity.
+ * here the user create an invitation
+ */
 public class InvitationActivity extends AppCompatActivity {
-    EditText distanceEt;
-    RadioButton RB1, RB2, RB3, RB4, RB5;
-    Button startBTN;
-    TextView clearTV, dateTV;
-    Calendar calNow, calSet;
-    String timeFormatStart, dateFormat, dateFrormatFB, key;
+    private EditText distanceEt;
+    private RadioButton RB1, RB2, RB3, RB4, RB5;
+    private Button startBTN, createBTN;
+    private TextView clearTV, dateTV;
+
     int distance, year, month, day;
     boolean level1, level2, level3, level4, level5;
+    boolean dateChoose = false, validTime = true;
+    String timeFormatStart, dateFormat, dateFrormatFB, key;
+
     InviteClass ic;
-    boolean dateChoose = false, startButton = false, validDate = true, validTime = true;
+    Calendar calNow, calSet;
     Intent gi;
 
 
@@ -63,22 +68,16 @@ public class InvitationActivity extends AppCompatActivity {
         RB4 = (RadioButton) findViewById(R.id.RB4);
         RB5 = (RadioButton) findViewById(R.id.RB5);
         startBTN = (Button) findViewById(R.id.startTimeBTN);
+        createBTN = (Button) findViewById(R.id.createBTN);
         clearTV = (TextView) findViewById(R.id.clearTV);
         dateTV = (TextView) findViewById(R.id.dateTV);
 
+        startBTN.setBackgroundColor(Color.TRANSPARENT);
+        startBTN.setClickable(false);
+        createBTN.setBackgroundColor(Color.TRANSPARENT);
+
         calNow = Calendar.getInstance();
         gi = getIntent();
-
-    }
-
-    @Override
-    protected void onStart() {
-        dateTV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDatePickerDialog();
-            }
-        });
 
         SpannableString ss = new SpannableString("clear");
         ClickableSpan span = new ClickableSpan() {
@@ -94,10 +93,26 @@ public class InvitationActivity extends AppCompatActivity {
         ss.setSpan(span, 0, 5, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         clearTV.setText(ss);
         clearTV.setMovementMethod(LinkMovementMethod.getInstance());
+
+    }
+
+    @Override
+    protected void onStart() {
+        // adding click listener for date TextView
+        dateTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDatePickerDialog();
+            }
+        });
+
         super.onStart();
     }
 
     private void showDatePickerDialog() {
+        startBTN.setClickable(false);
+        startBTN.setText("Start Time");
+        validTime = false;
         // Get the current date
         Calendar calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
@@ -117,12 +132,11 @@ public class InvitationActivity extends AppCompatActivity {
                             // Show a toast indicating that the selected date is invalid
                             Toast.makeText(InvitationActivity.this, "Please select a future date", Toast.LENGTH_SHORT).show();
                         } else {
-                            // Do something with the selected date
-                            // For example, you can display it or use it for further processing
+                            // saving the chosen date
                             dateFormat = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
                             dateFrormatFB = String.format("%02d%02d%04d", dayOfMonth, monthOfYear+1, year);
                             dateChoose = true;
-                            validTime = false;
+                            startBTN.setClickable(true);
                             dateTV.setText(dateFormat);
                             startBTN.setText("start time");
                         }
@@ -136,15 +150,23 @@ public class InvitationActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
+    /**
+     * On Click method Create btn.
+     *
+     * this method checks if all the fields are full and valid
+     * it saves all the information into an object and into the database
+     * after it's done, the user returns to Main Activity
+     * @param view the view
+     */
     public void createBtn(View view) {
-        if (dateChoose && startButton && validDate && validTime) {
+        if (dateChoose && validTime) {
             level1 = RB1.isChecked();
             level2 = RB2.isChecked();
             level3 = RB3.isChecked();
             level4 = RB4.isChecked();
             level5 = RB5.isChecked();
             if (level1 || level2 || level3 || level4 || level5){
-                if (!distanceEt.getText().toString().equals("")){
+                if (!distanceEt.getText().toString().isEmpty()){
                     distance = Integer.parseInt(distanceEt.getText().toString());
                     key = dateFrormatFB+timeFormatStart;
                     ic = new InviteClass(Uid, userName, userAddress, userCity, dateFormat, timeFormatStart, key,
@@ -162,10 +184,18 @@ public class InvitationActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * On Click method Start btn.
+     *
+     * this method opens a clock so that the user can choose a time for the invitation
+     * @param view the view
+     */
     public void startBTN(View view) {
         if (dateChoose){
-            startButton = true;
             openTimePickerDialog(true);
+        }
+        else{
+            Toast.makeText(InvitationActivity.this, "please choose a date before choosing the time", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -178,6 +208,10 @@ public class InvitationActivity extends AppCompatActivity {
         timePickerDialog.setTitle("Choose time");
         timePickerDialog.show();
     }
+
+    /**
+     * On time set listener.
+     */
     TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         /**
@@ -201,20 +235,19 @@ public class InvitationActivity extends AppCompatActivity {
             calSet.set(Calendar.SECOND, 0);
             calSet.set(Calendar.MILLISECOND, 0);
 
-            if (calSet.getTime().compareTo(calNow.getTime()) == 0) {
-                if (calSet.compareTo(calNow) >= 0) { //// check whats the problem
-                    Toast.makeText(InvitationActivity.this, "please select a valid hour.", Toast.LENGTH_SHORT).show();
-                    validTime = false;
-                    startBTN.setText("start time");
-                }
+            // checks if the chosen time is not in the past
+            long end = calNow.getTimeInMillis();
+            long start = calSet.getTimeInMillis();
+            if (TimeUnit.MILLISECONDS.toSeconds(end - start) > 0){
+                Toast.makeText(InvitationActivity.this, "please select a valid time.", Toast.LENGTH_SHORT).show();
+                startBTN.setText("start time");
+                validTime = false;
             }
-            else {
-                validTime = true;
-            }
+            else validTime = true;
 
 
-            if (dateChoose && validDate){
-                if (startButton && validTime){
+            if (dateChoose){
+                if (validTime){
                     timeFormatStart = String.format("%02d:%02d", hourOfDay, minute);
                     startBTN.setText(timeFormatStart);
                 }

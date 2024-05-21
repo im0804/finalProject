@@ -1,33 +1,24 @@
 package com.example.finalproject.Activities;
 
-import static com.example.finalproject.Activities.LoginActivity.Uid;
-import static com.example.finalproject.RegisterActivity.user;
-import static com.example.finalproject.Adapters.CustomAdapterHistory.score;
+import static com.example.finalproject.Activities.MainActivity.currentUser;
 import static com.example.finalproject.ReferencesFB.*;
-//import static com.example.finalproject.RegisterActivity.imagesRef;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ExifInterface;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -35,54 +26,49 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.finalproject.Adapters.CustomAdapterHistory;
-import com.example.finalproject.Objs.InviteClass;
 import com.example.finalproject.Objs.MatchClass;
 import com.example.finalproject.R;
-import com.example.finalproject.RegisterActivity;
-import com.example.finalproject.Objs.UsersClass;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.zip.CheckedInputStream;
 
 /**
- * @author		inbar menahem
- * @version	    1
- * @since		24/12/2023
- * the profile activity of the user.
+ * The type Profile activity.
+ *
+ * @author inbar menahem
+ * @version 1
+ * @since 24 /12/2023 the profile activity of the user.
  */
-
 public class ProfileActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener {
-    TextView fullNameTV, userNameTV, distanceTV, ageTV, cityTV,genderTV, yearsOfPlayTV, yearsOfCoachingTV, coachTypeTV, coachDesTV, titleTV;
-    ListView historyMatchesLV;
-    ImageView pfpIV;
-    LinearLayout coachLayout;
-    Intent si;
+    private TextView fullNameTV, userNameTV, distanceTV, ageTV, cityTV,genderTV, yearsOfPlayTV, yearsOfCoachingTV, coachTypeTV, coachDesTV, titleTV;
+    private ListView historyMatchesLV;
+    private ImageView pfpIV;
+    private LinearLayout coachLayout, layout;
+    private Button editBTN;
+
     MatchClass history;
-    StorageReference imageRef;
+
     ArrayList<MatchClass> arrHistory;
     CustomAdapterHistory historyCA;
+
     AlertDialog.Builder adb;
     ProgressDialog pd;
 
+    StorageReference imageRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-
 
         fullNameTV = (TextView) findViewById(R.id.fullNameTV);
         userNameTV = (TextView) findViewById(R.id.userNameTV);
@@ -97,8 +83,11 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         historyMatchesLV = (ListView) findViewById(R.id.historyMatchesLV);
         pfpIV = (ImageView) findViewById(R.id.pfpIV);
         coachLayout = (LinearLayout) findViewById(R.id.coachLayout);
+        layout = (LinearLayout) findViewById(R.id.allLayout);
         coachLayout.setVisibility(coachLayout.GONE);
         titleTV = (TextView) findViewById(R.id.titleTV);
+        editBTN = (Button) findViewById(R.id.editBTN);
+        editBTN.setBackgroundColor(Color.TRANSPARENT);
 
         arrHistory = new ArrayList<MatchClass>();
         historyCA = new CustomAdapterHistory(this, arrHistory);
@@ -120,30 +109,12 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
 
     }
 
-    ValueEventListener velHistory = new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot snapshot) {
-            arrHistory.clear();
-            for (DataSnapshot data : snapshot.getChildren()){
-                for (DataSnapshot secChild : data.getChildren()) {
-                    history = secChild.getValue(MatchClass.class);
-                    if(history.getUidInviter().equals(Uid)){
-                        arrHistory.add(history);
-                    }
-                    else if (history.getUidInvited().equals(Uid)){
-                        arrHistory.add(history);
-                    }
-                }
-            }
-            historyCA.notifyDataSetChanged();
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError error) {
-
-        }
-    };
-
+    /**
+     * On Click method Edit.
+     *
+     * this method moves the user to Profile Activity to change his details.
+     * @param view the view
+     */
     public void edit(View view) {
         Intent si = new Intent(this, RegisterActivity.class);
         si.putExtra("from profile", 1);
@@ -152,17 +123,15 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
 
     /**
      * show photo method
-     * <p>
+     * this method downloads the uploaded photo from Firebase Storage and shows it to the user.
      *
-     * @param	-
-     * @return	download the uploaded photo from firebase.
+     * @throws IOException the io exception
      */
     public void showPhoto() throws IOException {
         final File localFile = File.createTempFile(Uid,"jpg");
         imageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(ProfileActivity.this, "Image download success", Toast.LENGTH_LONG).show();
                 String filePath = localFile.getPath();
                 Bitmap bitmap = BitmapFactory.decodeFile(filePath);
                 pfpIV.setImageBitmap(bitmap);
@@ -181,6 +150,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         adb = new AlertDialog.Builder(this);
         adb.setCancelable(false);
+        // changing the profile to the chosen user' profile
         if (arrHistory.get(position).getUidInviter().equals(Uid)){
             adb.setTitle(arrHistory.get(position).getUserNameInvited() + "'s profile");
             adb.setMessage("do you want to see "+ arrHistory.get(position).getUserNameInvited() + "'s profile?");
@@ -205,6 +175,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     userProfile(arrHistory.get(position).getUidInviter());
+                    editBTN.setVisibility(View.GONE);
                     dialog.cancel();
                 }
             });
@@ -219,42 +190,66 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         ad.show();
         return true;
     }
+
+    /**
+     * User profile method .
+     * this method update all fields with user's information
+     *
+     * @param id chosen user Uid
+     */
     public void userProfile(String id){
         imageRef = imagesRef.child(id);
-        refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+
+        fullNameTV.setText("full name: " + '\n' + currentUser.getFullName());
+        userNameTV.setText("user name: " + '\n' + currentUser.getUserName());
+        distanceTV.setText("distance: " + '\n' + currentUser.getDistance());
+        ageTV.setText("age: " + currentUser.getAge());
+        genderTV.setText("gender: " + currentUser.getGender());
+        cityTV.setText("city: " + currentUser.getCity());
+        yearsOfPlayTV.setText("years of playing: " + '\n' + currentUser.getYearsOfPlay());
+        try {
+            showPhoto();
+        } catch (IOException e) {
+            Toast.makeText(ProfileActivity.this, "Image failed", Toast.LENGTH_LONG).show();
+        }
+        if (currentUser.isCoach()) {
+            layout.setBackgroundResource(R.drawable.profilecoach);
+            coachLayout.setVisibility(coachLayout.VISIBLE);
+            coachTypeTV.setText("coach type: " + '\n' + currentUser.getUserCoach().getCoachType());
+            coachDesTV.setText("coach description: " + '\n' + currentUser.getUserCoach().getDescription());
+            yearsOfCoachingTV.setText("years of coaching: " + '\n' + currentUser.getUserCoach().getYearsOfCoaching());
+        }
+        titleTV.setText(currentUser.getUserName());
+        history(id);
+    }
+
+    /**
+     * History method.
+     * this method get from database the matches history of the player
+     *
+     * @param id chosen user Uid
+     */
+    public void history(String id){
+        refPlayed.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> tsk) {
                 if (tsk.isSuccessful()) {
                     DataSnapshot dS = tsk.getResult();
                     for (DataSnapshot data : dS.getChildren()) {
-                        user = data.getValue(UsersClass.class);
-                        if (user.getUid().equals(Uid)) {
-                            fullNameTV.setText("full name: " + '\n' + user.getFullName());
-                            userNameTV.setText("user name: " + '\n' + user.getUserName());
-                            distanceTV.setText("distance: " + '\n' + user.getDistance());
-                            ageTV.setText("age: " + user.getAge());
-                            genderTV.setText("gender: " + user.getGender());
-                            cityTV.setText("city: " + user.getCity());
-                            yearsOfPlayTV.setText("years of coaching: " + '\n' + user.getYearsOfPlay());
-                            //boolean isCoach = user.getIsCoach();
-                            try {
-                                showPhoto();
-                            } catch (IOException e) {
-                                Toast.makeText(ProfileActivity.this, "Image failed", Toast.LENGTH_LONG).show();
+                        for (DataSnapshot secChild : data.getChildren()) {
+                            history = secChild.getValue(MatchClass.class);
+                            if(history.getUidInviter().equals(id)){
+                                arrHistory.add(history);
                             }
-                            if (user.getIsCoach()) {
-                                coachLayout.setVisibility(coachLayout.VISIBLE);
-                                coachTypeTV.setText("coach type: " + '\n' + user.getUserCoach().getCoachType());
-                                coachDesTV.setText("coach description: " + '\n' + user.getUserCoach().getDescription());
-                                yearsOfCoachingTV.setText("years of coaching: " + '\n' + user.getUserCoach().getYearsOfCoaching());
+                            else if (history.getUidInvited().equals(id)){
+                                arrHistory.add(history);
                             }
-                            titleTV.setText(user.getUserName());
                         }
                     }
+                    historyCA.notifyDataSetChanged();
                 }
             }
         });
-        refPlayed.addValueEventListener(velHistory);
     }
 
     @Override
@@ -267,11 +262,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         String str = item.getTitle().toString();
-        if (str.equals("register")){
-            si = new Intent(this, RegisterActivity.class);
-            startActivity(si);
-        }
-        else if (str.equals("main")){
+        if (str.equals("main")){
             Intent si = new Intent(this, MainActivity.class);
             startActivity(si);
         }
@@ -280,18 +271,6 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
             startActivity(si);
         }
         else if (str.equals("coach profile")){
-            Intent si = new Intent(this, CoachActivity.class);
-            startActivity(si);
-        }
-        else if (str.equals("join as coach")){
-            Intent si = new Intent(this, JoinAsCoachActivity.class);
-            startActivity(si);
-        }
-        else if (str.equals("login")) {
-            Intent si = new Intent(this, LoginActivity.class);
-            startActivity(si);
-        }
-        else if (str.equals("coachAct")) {
             Intent si = new Intent(this, CoachActivity.class);
             startActivity(si);
         }

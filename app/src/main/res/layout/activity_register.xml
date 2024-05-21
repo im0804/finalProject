@@ -2,10 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity"
-    android:layoutDirection="ltr">
+    android:background="@drawable/register"
+    android:layoutDirection="ltr"
+    tools:context=".Activities.RegisterActivity">
 
     <Space
         android:layout_width="0dp"
@@ -24,14 +26,11 @@
             android:layout_weight="7"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textView"
+            <Space
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="100"
-                android:gravity="center"
-                android:text="APP NAME"
-                android:textSize="23dp" />
+                android:layout_weight="100" />
+
         </LinearLayout>
 
         <Space
@@ -56,10 +55,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="30"
-                    android:onClick="pfp"
-                    android:src="@drawable/pfp"
                     android:adjustViewBounds="true"
-                    android:rotation="90"/>
+                    android:onClick="pfp"
+                    android:rotation="90"
+                    android:src="@drawable/pfp" />
 
                 <Space
                     android:layout_width="match_parent"
@@ -170,6 +169,11 @@
                 android:layout_weight="50"
                 android:orientation="vertical">
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2" />
+
                 <EditText
                     android:id="@+id/fullNameET"
                     android:layout_width="match_parent"
@@ -177,7 +181,8 @@
                     android:layout_weight="10"
                     android:ems="10"
                     android:hint="full name"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:textColor="@color/black"/>
 
                 <Space
                     android:layout_width="match_parent"
@@ -191,7 +196,8 @@
                     android:layout_weight="10"
                     android:ems="10"
                     android:hint="user name"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:textColor="@color/black"/>
 
                 <Space
                     android:layout_width="match_parent"
@@ -205,7 +211,8 @@
                     android:layout_weight="10"
                     android:ems="10"
                     android:hint="how far you can go play?"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:textColor="@color/black"/>
 
                 <Space
                     android:layout_width="match_parent"
@@ -219,12 +226,13 @@
                     android:layout_weight="10"
                     android:ems="10"
                     android:hint="age"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:textColor="@color/black"/>
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="5" />
+                    android:layout_weight="4" />
 
                 <EditText
                     android:id="@+id/addressET"
@@ -232,12 +240,13 @@
                     android:layout_height="0dp"
                     android:layout_weight="10"
                     android:ems="10"
-                    android:hint="address" />
+                    android:hint="address"
+                    android:textColor="@color/black"/>
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="5" />
+                    android:layout_weight="4" />
 
                 <EditText
                     android:id="@+id/yearsOfPlayET"
@@ -246,22 +255,41 @@
                     android:layout_weight="10"
                     android:ems="10"
                     android:hint="years of play"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:textColor="@color/black"/>
             </LinearLayout>
         </LinearLayout>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="8" />
 
-        <Button
-            android:id="@+id/nextBtn"
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10"
-            android:onClick="next"
-            android:text="NEXT" />
+            android:layout_weight="7"
+            android:orientation="horizontal">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="30" />
+
+            <Button
+                android:id="@+id/nextBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="40"
+                android:background="#005615"
+                android:onClick="next" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="30" />
+        </LinearLayout>
 
         <Space
             android:layout_width="match_parent"

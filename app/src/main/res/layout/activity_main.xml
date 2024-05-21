@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.MainActivity"
-    android:layoutDirection="ltr">
+    android:layoutDirection="ltr"
+    android:background="@drawable/main">
 
     <Space
         android:layout_width="0dp"
@@ -21,7 +22,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4" />
+            android:layout_weight="6" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,22 +33,17 @@
             <Space
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="80" />
+                android:layout_weight="70" />
 
             <Button
                 android:id="@+id/btnReminder"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="20"
-                android:onClick="remind"/>
+                android:layout_weight="25"
+                android:onClick="remind"
+                android:textSize="20dp"
+                android:textColor="@color/black"/>
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="4"
-            android:text="friends search" />
 
         <Space
             android:layout_width="match_parent"
@@ -58,8 +54,11 @@
             android:id="@+id/textView8"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4"
-            android:text="invites" />
+            android:layout_weight="6"
+            android:text="Invites"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
 
         <ListView
             android:id="@+id/invitesLV"
@@ -76,8 +75,11 @@
             android:id="@+id/textView16"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4"
-            android:text="my invites" />
+            android:layout_weight="6"
+            android:text="My Invites"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
 
         <ListView
             android:id="@+id/userInvitesLV"
@@ -94,8 +96,11 @@
             android:id="@+id/textView9"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4"
-            android:text="close matches" />
+            android:layout_weight="6"
+            android:text="close matches"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
 
         <ListView
             android:id="@+id/closeMatchesLV"
@@ -106,32 +111,34 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="7"
+            android:layout_weight="10"
             android:orientation="horizontal">
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="80" />
+                android:layout_weight="70" />
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/btnAddInvite"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="20"
+                android:layout_weight="25"
                 android:onClick="addAGame"
-                android:text="+" />
+                android:text="+"
+                android:textSize="20dp"
+                android:textColor="@color/black"/>
         </LinearLayout>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="3.5" />
 
     </LinearLayout>
 
     <Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="5" />
+        android:layout_weight="2" />
 </LinearLayout>

@@ -1,8 +1,8 @@
 package com.example.finalproject.Activities;
 
-import static com.example.finalproject.Activities.LoginActivity.Uid;
-import static com.example.finalproject.Activities.LoginActivity.userFB;
-import static com.example.finalproject.ReferencesFB.refUsers;
+import static com.example.finalproject.Activities.MainActivity.currentUser;
+import static com.example.finalproject.ReferencesFB.*;
+import static com.example.finalproject.Activities.MainActivity.currentLoc;
 
 
 import androidx.annotation.NonNull;
@@ -11,72 +11,92 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.example.finalproject.Adapters.CustomAdapterCoach;
+import com.example.finalproject.Adapters.CustomAdapterInvites;
 import com.example.finalproject.R;
-import com.example.finalproject.RegisterActivity;
 import com.example.finalproject.Objs.UsersClass;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 /**
- * @author		inbar menahem
- * @version	    1
- * @since		25/12/2023
  * activity for coach user.
+ * shows all the coach users.
  */
 public class CoachActivity extends AppCompatActivity {
-    ListView searchCoachLV, closeToYouLV;
+    private ListView closeToYouLV;
+    private Button btnJoin;
     Intent si;
     UsersClass user;
+
+    ArrayList<Float> arrDistance;
+    ArrayList<UsersClass> arrUsers;
+    CustomAdapterCoach customAdapterCoach;
+
     AlertDialog.Builder adb;
+    Location tempLoc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coach);
 
-        searchCoachLV = (ListView) findViewById(R.id.searchCoachlV);
         closeToYouLV = (ListView) findViewById(R.id.closeToYouLV);
+        btnJoin = (Button) findViewById(R.id.btnJoin);
+        btnJoin.setBackgroundColor(Color.TRANSPARENT);
+        arrDistance = new ArrayList<Float>();
+        arrUsers = new ArrayList<UsersClass>();
 
-        Query query = refUsers
-                .orderByChild("uid")
-                .equalTo(Uid);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        customAdapterCoach = new CustomAdapterCoach(CoachActivity.this, arrUsers);
+        closeToYouLV.setAdapter(customAdapterCoach);
+
+        refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dS) {
-                if (dS.exists()) {
+            public void onComplete(@NonNull Task<DataSnapshot> tsk) {
+                if (tsk.isSuccessful()) {
+                    DataSnapshot dS = tsk.getResult();
+                    tempLoc = new Location("temp location");
                     for (DataSnapshot data : dS.getChildren()) {
                         user = data.getValue(UsersClass.class);
+                        if (user.isCoach() && !user.getUid().equals(Uid)){
+                            arrUsers.add(user);
+                            tempLoc.setLatitude(user.getAddLatitude());
+                            tempLoc.setLongitude(user.getAddLongitude());
+                            arrDistance.add(currentLoc.distanceTo(tempLoc));
+                        }
                     }
+                    customAdapterCoach.notifyDataSetChanged();
                 }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(CoachActivity.this, "on cancelled", Toast.LENGTH_LONG).show();
             }
         });
 
-        adb = new AlertDialog.Builder(this);
+    }
+
+    public void sortUsersByDistance() {
     }
 
     /**
      * on click join method
      * <p>
-     *
      * @param    view the view
-     * @return   moves the user to the sign in as a coach activity.
+     * moves the user to the sign in as a coach activity.
+     * if the user is already a coach, it will show an alert dialog.
      */
     public void join(View view) {
-        if (user.getIsCoach()){
-            adb.setTitle("already joined");
+        if (currentUser.isCoach()){
+            adb = new AlertDialog.Builder(this);
+            adb.setTitle("you've already joined!");
             adb.setMessage("choose what do you want to do");
             adb.setPositiveButton("go back to main screen", new DialogInterface.OnClickListener() {
                 @Override
@@ -108,11 +128,7 @@ public class CoachActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         String str = item.getTitle().toString();
-        if (str.equals("register")){
-            Intent si = new Intent(this, RegisterActivity.class);
-            startActivity(si);
-        }
-        else if (str.equals("main")){
+        if (str.equals("main")){
             Intent si = new Intent(this, MainActivity.class);
             startActivity(si);
         }
@@ -124,14 +140,6 @@ public class CoachActivity extends AppCompatActivity {
             Intent si = new Intent(this, CoachActivity.class);
             startActivity(si);
         }
-        else if (str.equals("join as coach")){
-        }
-        else if (str.equals("login")) {
-            Intent si = new Intent(this, LoginActivity.class);
-            startActivity(si);
-        } else if (str.equals("coachAct")) {
-        }
-
         return super.onOptionsItemSelected(item);
     }
 

@@ -1,25 +1,25 @@
 package com.example.finalproject.Activities;
 
-import static com.example.finalproject.Activities.LoginActivity.Uid;
-import static com.example.finalproject.Activities.LoginActivity.userFB;
-import static com.example.finalproject.RegisterActivity.user;
+import static com.example.finalproject.Activities.MainActivity.currentUser;
+import static com.example.finalproject.ReferencesFB.Uid;
 import static com.example.finalproject.ReferencesFB.refUsers;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.example.finalproject.Objs.CoachUserClass;
 import com.example.finalproject.R;
-import com.example.finalproject.RegisterActivity;
 import com.example.finalproject.Objs.UsersClass;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,18 +27,18 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 /**
- * @author		inbar menahem
- * @version	    1
- * @since		25/12/2023
- * activity for new coaches.
+ * Join As Coach activity.
+ *
+ * here the user can join to the coaches community
  */
 public class JoinAsCoachActivity extends AppCompatActivity {
-    // להוסיף בדיקה לרדיו בטן לבדוק על המספר עליו לחץ
-    EditText yearsOfCoachingEt, desET;
-    RadioButton begCRB, groupsRB, competitiveRB, allRB;
+    private EditText yearsOfCoachingEt, desET;
+    private RadioButton begCRB, groupsRB, competitiveRB, allRB;
+    private Button btnFinish;
+
     String coachType;
+
     CoachUserClass userCoach;
-    //UsersClass newUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,42 +51,19 @@ public class JoinAsCoachActivity extends AppCompatActivity {
         groupsRB = (RadioButton) findViewById(R.id.groupsRB);
         competitiveRB = (RadioButton) findViewById(R.id.competitiveRB);
         allRB = (RadioButton) findViewById(R.id.allRB);
+        btnFinish = (Button) findViewById(R.id.btnFinish);
 
-        Query query = refUsers
-                .orderByChild("uid")
-                .equalTo(Uid);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dS) {
-                if (dS.exists()) {
-                    for(DataSnapshot data : dS.getChildren()) {
-                        user = data.getValue(UsersClass.class);
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(JoinAsCoachActivity.this, "on cancelled" , Toast.LENGTH_LONG).show();
-            }
-        });
-
+        btnFinish.setBackgroundColor(Color.TRANSPARENT);
 
     }
 
-    /**
-     * event listener method
-     * <p>
-     *
-     * @return	checks for changes and set the text in the texr views.
-     */
-
 
     /**
-     * on click finish method
-     * <p>
+     * On Click method Finish
+     * this method update the user's object and upload them to firebase.
+     * after finishing, the user moves to Main Activity.
      *
-     * @param    view the view
-     * @return   update the user's attributes and upload them to firebase.
+     * @param view the view
      */
     public void finishBTN(View view) {
         if ((yearsOfCoachingEt.getText().toString().equals("")) || (desET.getText().toString().equals(""))){
@@ -102,12 +79,13 @@ public class JoinAsCoachActivity extends AppCompatActivity {
             } else if (allRB.isChecked()) {
                 coachType = "all levels";
             }
-            user.setIsCoach(true);
+            currentUser.setCoach(true);
             userCoach = new CoachUserClass(Integer.parseInt(yearsOfCoachingEt.getText().toString()), coachType, desET.getText().toString());
-            user = new UsersClass(user, userCoach);
-            refUsers.child(Uid).setValue(user);
+            currentUser = new UsersClass(currentUser, userCoach);
+            refUsers.child(Uid).setValue(currentUser);
 
-            finish();
+            Intent intent = new Intent(JoinAsCoachActivity.this, MainActivity.class);
+            startActivity(intent);
         }
 
     }
@@ -121,11 +99,7 @@ public class JoinAsCoachActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         String str = item.getTitle().toString();
-        if (str.equals("register")){
-            Intent si = new Intent(this, RegisterActivity.class);
-            startActivity(si);
-        }
-        else if (str.equals("main")){
+        if (str.equals("main")){
             Intent si = new Intent(this, MainActivity.class);
             startActivity(si);
         }
@@ -134,16 +108,6 @@ public class JoinAsCoachActivity extends AppCompatActivity {
             startActivity(si);
         }
         else if (str.equals("coach profile")){
-            Intent si = new Intent(this, CoachActivity.class);
-            startActivity(si);
-        }
-        else if (str.equals("join as coach")){
-        }
-        else if (str.equals("login")) {
-            Intent si = new Intent(this, LoginActivity.class);
-            startActivity(si);
-        }
-        else if (str.equals("coachAct")) {
             Intent si = new Intent(this, CoachActivity.class);
             startActivity(si);
         }

@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.InvitationActivity"
-    android:layoutDirection="ltr">
+    android:layoutDirection="ltr"
+    android:background="@drawable/invitation">
 
     <Space
         android:layout_width="0dp"
@@ -21,27 +22,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="10"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="100"
-                android:text="create an invitation"
-                android:textSize="25dp"/>
-        </LinearLayout>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="6" />
+            android:layout_weight="20" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,7 +33,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="20"
+                android:layout_weight="19"
                 android:orientation="horizontal">
 
                 <TextView
@@ -61,16 +42,20 @@
                     android:layout_height="match_parent"
                     android:layout_weight="10"
                     android:text="day: "
-                    android:textSize="18dp"/>
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
 
                 <TextView
                     android:id="@+id/dateTV"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="50"
+                    android:gravity="center"
                     android:text="choose a date"
                     android:textSize="20dp"
-                    android:gravity="center"/>
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
 
                 <Space
                     android:layout_width="0dp"
@@ -96,7 +81,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="10"
                     android:text="hour: "
-                    android:textSize="18dp"/>
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
 
                 <Space
                     android:layout_width="0dp"
@@ -108,10 +95,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="40"
-                    android:background="@color/white"
                     android:onClick="startBTN"
                     android:text="start time"
-                    android:textSize="18dp"/>
+                    android:textColor="@color/quantum_deeppurple400"
+                    android:textSize="18dp"
+                    android:textStyle="bold"/>
 
 
                 <Space
@@ -138,7 +126,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="25"
                     android:text="level of opponent: "
-                    android:textSize="18dp"/>
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -229,7 +219,9 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="10"
-                            android:text="1" />
+                            android:text="1"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"/>
 
                         <Space
                             android:layout_width="0dp"
@@ -241,7 +233,9 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="10"
-                            android:text="2" />
+                            android:text="2"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"/>
 
                         <Space
                             android:layout_width="0dp"
@@ -253,7 +247,9 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="10"
-                            android:text="3" />
+                            android:text="3"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"/>
 
                         <Space
                             android:layout_width="0dp"
@@ -265,7 +261,9 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="10"
-                            android:text="4" />
+                            android:text="4"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"/>
 
                         <Space
                             android:layout_width="0dp"
@@ -277,7 +275,9 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="10"
-                            android:text="5" />
+                            android:text="5"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"/>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -306,7 +306,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="3" />
+                android:layout_weight="6" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -320,7 +320,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="30"
                     android:text="the distance you're willing to go play: "
-                    android:textSize="18dp"/>
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
 
                 <EditText
                     android:id="@+id/distanceEt"
@@ -329,7 +331,9 @@
                     android:layout_weight="60"
                     android:ems="10"
                     android:hint="distance"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
 
                 <Space
                     android:layout_width="0dp"
@@ -342,7 +346,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10" />
+            android:layout_weight="8" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -356,13 +360,12 @@
                 android:layout_weight="20" />
 
             <Button
-                android:id="@+id/button4"
+                android:id="@+id/createBTN"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="60"
                 android:onClick="createBtn"
-                android:text="create invitation"
-                android:textSize="18dp"/>
+                android:textSize="18dp" />
 
             <Space
                 android:layout_width="0dp"

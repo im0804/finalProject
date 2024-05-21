@@ -63,9 +63,9 @@ public class CustomAdapterInvites extends BaseAdapter {
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvUserName = (TextView) itemView.findViewById(R.id.tvUserName);
-            tvDate = (TextView) itemView.findViewById(R.id.tvDate);
-            tvTime = (TextView) itemView.findViewById(R.id.tvTime);
-            tvLocation = (TextView) itemView.findViewById(R.id.tvLocation);
+            tvDate = (TextView) itemView.findViewById(R.id.tvUsername);
+            tvTime = (TextView) itemView.findViewById(R.id.tvName);
+            tvLocation = (TextView) itemView.findViewById(R.id.tvCity);
         }
     }
 

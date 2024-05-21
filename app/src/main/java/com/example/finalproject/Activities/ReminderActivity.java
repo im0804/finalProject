@@ -1,52 +1,50 @@
 package com.example.finalproject.Activities;
 
 import static com.example.finalproject.Activities.MainActivity.arrPassed;
-import static com.example.finalproject.ReferencesFB.refNotPlayed;
-import static com.example.finalproject.ReferencesFB.refPlayed;
+import static com.example.finalproject.ReferencesFB.*;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.finalproject.Objs.EndMatchClass;
 import com.example.finalproject.Objs.MatchClass;
 import com.example.finalproject.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
+
+/**
+ * Reminder activity.
+ * here the user enters result of a finished match
+ */
 public class ReminderActivity extends AppCompatActivity {
 
-    TextView uid1TV, uid2TV, title1TV;
-    EditText set11ET, set12ET, set21ET, set22ET, set31ET, set32ET, set41ET, set42ET, set51ET, set52ET;
-    ArrayList<MatchClass> arrHistory;
-    ArrayList<String> score;
+    private TextView uid1TV, uid2TV, title1TV;
+    private EditText set11ET, set12ET, set21ET, set22ET, set31ET, set32ET, set41ET, set42ET, set51ET, set52ET;
+    private Button btnDelete, btnAdd, BTNFinish;
+
+    boolean allGood = false;
+    int counter = 0, player1Sets=0, player2Sets=0, scoreCounter = 0;
+    String userNameInviter, userNameInvited, date, winner;
+
     MatchClass match;
     EndMatchClass endMatch = new EndMatchClass();
-    String winner;
+
+    ArrayList<MatchClass> arrHistory;
+    ArrayList<String> score;
+
     AlertDialog.Builder adb;
     Intent gi;
-    String userNameInviter, userNameInvited, date;
-    boolean allGood = false, finishBTN = false, isEmpty = false;
-    int counter = 0, player1Sets=0, player2Sets=0;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +64,12 @@ public class ReminderActivity extends AppCompatActivity {
         set42ET = (EditText) findViewById(R.id.set42ET);
         set51ET = (EditText) findViewById(R.id.set51ET);
         set52ET = (EditText) findViewById(R.id.set52ET);
+        btnDelete = (Button) findViewById(R.id.deleteBTN);
+        btnAdd = (Button) findViewById(R.id.addBTN);
+        BTNFinish = (Button) findViewById(R.id.finishBTN);
+        btnDelete.setBackgroundColor(Color.TRANSPARENT);
+        btnAdd.setBackgroundColor(Color.TRANSPARENT);
+        BTNFinish.setBackgroundColor(Color.TRANSPARENT);
 
         set21ET.setEnabled(false);
         set22ET.setEnabled(false);
@@ -76,7 +80,6 @@ public class ReminderActivity extends AppCompatActivity {
         set51ET.setEnabled(false);
         set52ET.setEnabled(false);
 
-
         score = new ArrayList<String>();
 
         arrHistory = new ArrayList<MatchClass>();
@@ -86,22 +89,29 @@ public class ReminderActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        match = arrPassed.get(0);
-        userNameInviter = match.getUserNameInviter();
-        userNameInvited = match.getUserNameInvited();
-        date = match.getDate();
 
-    if (!arrPassed.isEmpty()) {
-        title1TV.setText(date + " "+ match.getUserNameInviter()+" VS "+ match.getUserNameInvited());
-        uid1TV.setText(match.getUserNameInviter());
-        uid2TV.setText(match.getUserNameInvited());
-
+        //sets the design.
+        if (!arrPassed.isEmpty()) {
+            match = arrPassed.get(0);
+            userNameInviter = match.getUserNameInviter();
+            userNameInvited = match.getUserNameInvited();
+            date = match.getDate();
+            title1TV.setText(date + " "+ match.getUserNameInviter()+" VS "+ match.getUserNameInvited());
+            uid1TV.setText(match.getUserNameInviter());
+            uid2TV.setText(match.getUserNameInvited());
         }
     }
 
+    /**
+     * On Click method Close match.
+     *
+     * this method checks validity of all fields
+     * it counts how many sets each player has
+     * if all is good, it saves all the information in database
+     * @param view the view
+     */
     public void closeMatch(View view) {
-        finishBTN = true;
-        if (score.isEmpty()) {
+        if (score.isEmpty() || scoreCounter == 0) {
             if (checkScore(set11ET, set12ET)){
                 score.add(set11ET.getText().toString() + " : " + set12ET.getText().toString());
                 if (Integer.parseInt(set11ET.getText().toString()) - Integer.parseInt(set12ET.getText().toString()) > 0){
@@ -112,52 +122,45 @@ public class ReminderActivity extends AppCompatActivity {
                 }
             }
         }
-        if (score.size() == 1) {
+        if (score.size() == 1 || scoreCounter == 1) {
             if (checkScore(set21ET, set22ET)){
-                if (!isEmpty) {
-                    score.add(set21ET.getText().toString() + " : " + set22ET.getText().toString());
-                    if (Integer.parseInt(set21ET.getText().toString()) - Integer.parseInt(set22ET.getText().toString()) > 0) {
-                        player1Sets++;
-                    } else {
-                        player2Sets++;
-                    }
+                score.add(set21ET.getText().toString() + " : " + set22ET.getText().toString());
+                if (Integer.parseInt(set21ET.getText().toString()) - Integer.parseInt(set22ET.getText().toString()) > 0) {
+                    player1Sets++;
+                } else {
+                    player2Sets++;
                 }
             }
         }
-        if (score.size() == 2) {
+        if (score.size() == 2 || scoreCounter == 2) {
             if (checkScore(set31ET, set32ET)){
-                if (!isEmpty) {
-                    score.add(set31ET.getText().toString() + " : " + set32ET.getText().toString());
-                    if (Integer.parseInt(set31ET.getText().toString()) - Integer.parseInt(set32ET.getText().toString()) > 0) {
-                        player1Sets++;
-                    } else {
-                        player2Sets++;
-                    }
+                score.add(set31ET.getText().toString() + " : " + set32ET.getText().toString());
+                if (Integer.parseInt(set31ET.getText().toString()) - Integer.parseInt(set32ET.getText().toString()) > 0) {
+                    player1Sets++;
+                } else {
+                    player2Sets++;
                 }
             }
         }
-        if (score.size() == 3) {
+        if (score.size() == 3 || scoreCounter == 3) {
             if (checkScore(set41ET, set42ET)){
-                if (!isEmpty) {
-                    score.add(set41ET.getText().toString() + " : " + set42ET.getText().toString());
-                    if (Integer.parseInt(set41ET.getText().toString()) - Integer.parseInt(set42ET.getText().toString()) > 0) {
-                        player1Sets++;
-                    } else {
-                        player2Sets++;
-                    }
+                score.add(set41ET.getText().toString() + " : " + set42ET.getText().toString());
+                if (Integer.parseInt(set41ET.getText().toString()) - Integer.parseInt(set42ET.getText().toString()) > 0) {
+                    player1Sets++;
+                } else {
+                    player2Sets++;
                 }
             }
         }
-        if (score.size() == 4) {
+        if (score.size() == 4 || scoreCounter == 4) {
             if (checkScore(set51ET, set52ET)) {
-                if (!isEmpty) {
-                    score.add(set51ET.getText().toString() + " : " + set52ET.getText().toString());
-                    if (Integer.parseInt(set51ET.getText().toString()) - Integer.parseInt(set52ET.getText().toString()) > 0) {
-                        player1Sets++;
-                    } else {
-                        player2Sets++;
-                    }
+                score.add(set51ET.getText().toString() + " : " + set52ET.getText().toString());
+                if (Integer.parseInt(set51ET.getText().toString()) - Integer.parseInt(set52ET.getText().toString()) > 0) {
+                    player1Sets++;
+                } else {
+                    player2Sets++;
                 }
+
             }
         }
 
@@ -181,18 +184,29 @@ public class ReminderActivity extends AppCompatActivity {
             finish();
         }
         else {
-            Toast.makeText(this, "something is wrong", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ReminderActivity.this, "check if all written sets are valid", Toast.LENGTH_LONG).show();
         }
     }
 
+    /**
+     * method Check score.
+     *
+     * this method checks if added score is valid
+     * @param scorePlayer1  player 1's score
+     * @param scorePlayer2  player 2's score
+     */
     public boolean checkScore(EditText scorePlayer1, EditText scorePlayer2){
         allGood = false;
+        if (scorePlayer1.getText().toString().isEmpty() && scorePlayer1.getText().toString().isEmpty()){
+            allGood = true;
+            return false;
+        }
         if (!scorePlayer1.getText().toString().isEmpty() && !scorePlayer2.getText().toString().isEmpty()) {
             if (isLegalScore(scorePlayer1.getText().toString(), scorePlayer2.getText().toString())) {
                 allGood = true;
             }
             else {
-                Toast.makeText(this, "please enter a valid score", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "please enter a valid score", Toast.LENGTH_LONG).show();
                 scorePlayer1.setText("");
                 scorePlayer2.setText("");
                 allGood = false;
@@ -200,49 +214,77 @@ public class ReminderActivity extends AppCompatActivity {
         }
         else {
             if ((!scorePlayer1.getText().toString().isEmpty() || !scorePlayer1.getText().toString().isEmpty())){
-                Toast.makeText(this, "please enter a valid score", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "please enter a valid score", Toast.LENGTH_LONG).show();
                 scorePlayer1.setText("");
                 scorePlayer2.setText("");
                 allGood = false;
-            }
-
-            if (scorePlayer1.getText().toString().isEmpty() && scorePlayer1.getText().toString().isEmpty()){
-                allGood = true;
-                isEmpty = true;
             }
         }
         return allGood;
     }
 
+    /**
+     * On Click method Add set.
+     *
+     * this method checks if previous set is valid, if so it opens another set
+     * @param view the view
+     */
     public void addSet(View view) {
         if (counter == 0) {
             if (checkScore(set11ET, set12ET)){
                 set21ET.setEnabled(true);
                 set22ET.setEnabled(true);
+                counter++;
+                scoreCounter++;
+            }
+            else{
+                Toast.makeText(ReminderActivity.this, "please enter a valid score", Toast.LENGTH_SHORT).show();
             }
         }
-        if (counter == 1) {
+        else if (counter == 1) {
             if (checkScore(set21ET, set22ET)){
                 set31ET.setEnabled(true);
                 set32ET.setEnabled(true);
+                counter++;
+                scoreCounter++;
+            }
+            else{
+                Toast.makeText(ReminderActivity.this, "please enter a valid score", Toast.LENGTH_LONG).show();
             }
         }
-        if (counter == 2) {
+        else if (counter == 2) {
             if (checkScore(set31ET, set32ET)){
                 set41ET.setEnabled(true);
                 set42ET.setEnabled(true);
+                counter++;
+                scoreCounter++;
+            }
+            else{
+                Toast.makeText(ReminderActivity.this, "please enter a valid score", Toast.LENGTH_LONG).show();
             }
         }
-        if (counter == 3) {
+        else if (counter == 3) {
             if (checkScore(set41ET, set42ET)){
                 set51ET.setEnabled(true);
                 set52ET.setEnabled(true);
+                counter++;
+                scoreCounter++;
+            }
+            else{
+                Toast.makeText(ReminderActivity.this, "please enter a valid score", Toast.LENGTH_LONG).show();
             }
         }
 
-        counter++;
     }
 
+    /**
+     * On Click method Delete.
+     *
+     * this method deletes the meeting
+     * it opens a dialog that asks if the user is sure
+     * if so then it deletes the meeting from database
+     * @param view the view
+     */
     public void delete(View view) {
         adb = new AlertDialog.Builder(this);
         adb.setTitle("delete meeting");
@@ -250,7 +292,6 @@ public class ReminderActivity extends AppCompatActivity {
         adb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // check how to remove the value, using the inviter or rhe invited
                 refNotPlayed.child(match.getUidInvited())
                         .child(match.getKey())
                         .removeValue();
@@ -269,6 +310,13 @@ public class ReminderActivity extends AppCompatActivity {
         ad.show();
     }
 
+    /**
+     * Is legal score method.
+     *
+     * this method checks if the given games are legal
+     * @param score3 player 1's game
+     * @param score4 player 2's game
+     */
     public static boolean isLegalScore(String score3, String  score4) {
         // check if one of them is null
         if ((score3.isEmpty()) || (score4.isEmpty())){

@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.JoinAsCoachActivity"
-    android:layoutDirection="ltr">
+    android:layoutDirection="ltr"
+    android:background="@drawable/joincoach">
 
     <Space
         android:layout_width="0dp"
@@ -21,19 +22,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
-
-        <TextView
-            android:id="@+id/textView14"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="5"
-            android:text="coach details" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="10" />
 
         <EditText
             android:id="@+id/yearsOfCoachingET"
@@ -42,7 +31,10 @@
             android:layout_weight="10"
             android:ems="10"
             android:hint="years of coaching"
-            android:inputType="text" />
+            android:inputType="text"
+            android:textStyle="bold"
+            android:textSize="16dp"
+            android:textColor="@color/black"/>
 
         <Space
             android:layout_width="match_parent"
@@ -54,7 +46,10 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5"
-            android:text="coach type" />
+            android:text="coach type"
+            android:textStyle="bold"
+            android:textSize="16dp"
+            android:textColor="@color/black"/>
 
         <RadioGroup
             android:layout_width="match_parent"
@@ -65,30 +60,42 @@
                 android:id="@+id/groupsRB"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="8"
+                android:layout_weight="12"
                 android:checked="true"
-                android:text="groups" />
+                android:text="groups"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <RadioButton
                 android:id="@+id/competitiveRB"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="8"
-                android:text="competitive" />
+                android:text="competitive"
+                android:textStyle="bold"
+                android:textSize="16dp"
+                android:textColor="@color/black"/>
 
             <RadioButton
                 android:id="@+id/begCRB"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="8"
-                android:text="beginners" />
+                android:text="beginners"
+                android:textStyle="bold"
+                android:textSize="16dp"
+                android:textColor="@color/black"/>
 
             <RadioButton
                 android:id="@+id/allRB"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="8"
-                android:text="all levels" />
+                android:text="all levels"
+                android:textStyle="bold"
+                android:textSize="16dp"
+                android:textColor="@color/black"/>
 
         </RadioGroup>
 
@@ -104,20 +111,24 @@
             android:layout_weight="20"
             android:ems="10"
             android:hint="description of yourself"
-            android:inputType="text" />
+            android:inputType="text"
+            android:textStyle="bold"
+            android:textSize="16dp"
+            android:textColor="@color/black"/>
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/btnFinish"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:text="finish"
-            android:onClick="finishBTN"/>
+            android:onClick="finishBTN"
+            android:textSize="20dp"
+            android:textStyle="bold" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="20" />
+            android:layout_weight="23" />
 
     </LinearLayout>
 

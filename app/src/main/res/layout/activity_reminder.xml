@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.ReminderActivity"
-    android:layoutDirection="ltr">
+    android:layoutDirection="ltr"
+    android:background="@drawable/scores">
 
     <Space
         android:layout_width="0dp"
@@ -25,19 +26,18 @@
             android:layout_weight="10"
             android:orientation="vertical">
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="10" />
+
             <TextView
                 android:id="@+id/title1TV"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="10"
-                android:gravity="center"
-                android:textSize="28dp"
-                android:text="GAME, SET and MATCH!" />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="5" />
+                android:layout_weight="8"
+                android:textSize="25dp"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/textView32"
@@ -46,7 +46,9 @@
                 android:layout_weight="7"
                 android:gravity="left"
                 android:text="score:"
-                android:textSize="20dp" />
+                android:textSize="24dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -59,7 +61,10 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="10"
-                    android:text="uid1" />
+                    android:text="uid1"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
 
                 <Space
                     android:layout_width="0dp"
@@ -71,7 +76,10 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="10"
-                    android:text="uid2" />
+                    android:text="uid2"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
 
             </LinearLayout>
 
@@ -247,12 +255,11 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/button5"
+                    android:id="@+id/deleteBTN"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="10"
-                    android:onClick="delete"
-                    android:text="delete" />
+                    android:onClick="delete" />
 
                 <Space
                     android:layout_width="0dp"
@@ -260,12 +267,11 @@
                     android:layout_weight="5" />
 
                 <Button
-                    android:id="@+id/button8"
+                    android:id="@+id/addBTN"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="10"
-                    android:onClick="addSet"
-                    android:text="add set" />
+                    android:onClick="addSet" />
 
                 <Space
                     android:layout_width="0dp"
@@ -273,12 +279,11 @@
                     android:layout_weight="5" />
 
                 <Button
-                    android:id="@+id/button7"
+                    android:id="@+id/finishBTN"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="10"
-                    android:onClick="closeMatch"
-                    android:text="finish" />
+                    android:onClick="closeMatch" />
 
             </LinearLayout>
 

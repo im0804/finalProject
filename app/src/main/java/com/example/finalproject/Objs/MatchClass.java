@@ -10,7 +10,6 @@ public class MatchClass {
     private String date;
     private String hour;
     private String key;
-    //String location;
     private EndMatchClass endMatch;
 
     public MatchClass(){}
