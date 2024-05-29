@@ -78,10 +78,12 @@ public class SignUpActivity extends AppCompatActivity {
                                 }
                                 else {
                                     Toast.makeText(SignUpActivity.this, "e-mail or password are wrong!", Toast.LENGTH_LONG).show();
+                                    pd.dismiss();
                                 }
                             }
                             else {
                                 Toast.makeText(SignUpActivity.this, "There may already be an account with these details.", Toast.LENGTH_SHORT).show();
+                                pd.dismiss();
                             }
                         }
                     });

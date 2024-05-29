@@ -49,7 +49,7 @@ public class UsersClass {
         this.yearsOfPlay = user.yearsOfPlay;
         this.distance = user.distance;
         this.isCoach = true;
-        userCoach = new CoachUserClass(userCoach1.getYearsOfCoaching(), userCoach1.getCoachType(), userCoach1.getDescription());
+        userCoach = new CoachUserClass(userCoach1.getYearsOfCoaching(), userCoach1.getCoachType());
     }
 
 

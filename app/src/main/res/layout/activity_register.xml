@@ -56,6 +56,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="30"
                     android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
                     android:onClick="pfp"
                     android:rotation="90"
                     android:src="@drawable/pfp" />
@@ -210,9 +211,8 @@
                     android:layout_height="0dp"
                     android:layout_weight="10"
                     android:ems="10"
-                    android:hint="how far you can go play?"
-                    android:inputType="text"
-                    android:textColor="@color/black"/>
+                    android:hint="distance"
+                    android:inputType="numberSigned" />
 
                 <Space
                     android:layout_width="match_parent"

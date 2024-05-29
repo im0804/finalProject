@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.finalproject.Objs.MatchClass;
+import com.example.finalproject.Objs.UserDistanceClass;
 import com.example.finalproject.Objs.UsersClass;
 import com.example.finalproject.R;
 
@@ -19,10 +20,10 @@ import java.util.ArrayList;
 
 public class CustomAdapterCoach extends BaseAdapter {
     private Context context;
-    private ArrayList<UsersClass> arrCoaches;
+    private ArrayList<UserDistanceClass> arrCoaches;
     private LayoutInflater inflater;
 
-    public CustomAdapterCoach(Context context, ArrayList<UsersClass> arrCoaches) {
+    public CustomAdapterCoach(Context context, ArrayList<UserDistanceClass> arrCoaches) {
         this.context = context;
         this.arrCoaches = arrCoaches;
         inflater = (LayoutInflater.from(context));
@@ -52,9 +53,9 @@ public class CustomAdapterCoach extends BaseAdapter {
 
 
         if (!arrCoaches.isEmpty()){
-            viewholder.tvUsername.setText(arrCoaches.get(position).getUserName());
-            viewholder.tvName.setText(arrCoaches.get(position).getFullName());
-            viewholder.tvCity.setText(arrCoaches.get(position).getCity());
+            viewholder.tvUsername.setText(arrCoaches.get(position).getUser().getUserName());
+            viewholder.tvName.setText(arrCoaches.get(position).getUser().getFullName());
+            viewholder.tvCity.setText(arrCoaches.get(position).getUser().getCity());
         }
         return view;
     }

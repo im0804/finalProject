@@ -5,9 +5,11 @@ import static com.example.finalproject.Activities.MainActivity.userCity;
 import static com.example.finalproject.Activities.MainActivity.userName;
 import static com.example.finalproject.ReferencesFB.*;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -28,6 +30,7 @@ import android.widget.Toast;
 import com.example.finalproject.Objs.InviteClass;
 import com.example.finalproject.R;
 import com.example.finalproject.Objs.UsersClass;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
@@ -41,13 +44,12 @@ import java.util.concurrent.TimeUnit;
  * here the user create an invitation
  */
 public class InvitationActivity extends AppCompatActivity {
-    private EditText distanceEt;
-    private RadioButton RB1, RB2, RB3, RB4, RB5;
+    private RadioButton RB1, RB2, RB3, RB4;
     private Button startBTN, createBTN;
     private TextView clearTV, dateTV;
 
-    int distance, year, month, day;
-    boolean level1, level2, level3, level4, level5;
+    int year, month, day;
+    boolean level1, level2, level3, level4;
     boolean dateChoose = false, validTime = true;
     String timeFormatStart, dateFormat, dateFrormatFB, key;
 
@@ -61,12 +63,10 @@ public class InvitationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_invitation);
 
-        distanceEt = (EditText) findViewById(R.id.distanceEt);
         RB1 = (RadioButton) findViewById(R.id.RB1);
         RB2 = (RadioButton) findViewById(R.id.RB2);
         RB3 = (RadioButton) findViewById(R.id.RB3);
         RB4 = (RadioButton) findViewById(R.id.RB4);
-        RB5 = (RadioButton) findViewById(R.id.RB5);
         startBTN = (Button) findViewById(R.id.startTimeBTN);
         createBTN = (Button) findViewById(R.id.createBTN);
         clearTV = (TextView) findViewById(R.id.clearTV);
@@ -87,7 +87,6 @@ public class InvitationActivity extends AppCompatActivity {
                 RB2.setChecked(false);
                 RB3.setChecked(false);
                 RB4.setChecked(false);
-                RB5.setChecked(false);
             }
         };
         ss.setSpan(span, 0, 5, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -106,6 +105,33 @@ public class InvitationActivity extends AppCompatActivity {
             }
         });
 
+        //checking if the user came from edit invitation or '+' button
+        if (gi.getStringExtra("uidEditKey") != null) {
+            ProgressDialog pd = ProgressDialog.show(this, "invite info", "downloading...");
+            refInvites.child(Uid).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> tsk) {
+                    if (tsk.isSuccessful()) {
+                        DataSnapshot dS = tsk.getResult();
+                        for (DataSnapshot data : dS.getChildren()) {
+                            ic = data.getValue(InviteClass.class);
+                            startBTN.setText(ic.getStartTime());
+                            if (level1)
+                                RB1.setChecked(true);
+                            if (level2)
+                                RB2.setChecked(true);
+                            if (level3)
+                                RB3.setChecked(true);
+                            if (level4)
+                                RB4.setChecked(true);
+                            dateTV.setText(ic.getDate());
+                            dateTV.setEnabled(false);
+                        }
+                        pd.dismiss();
+                    }
+                }
+            });
+        }
         super.onStart();
     }
 
@@ -164,24 +190,27 @@ public class InvitationActivity extends AppCompatActivity {
             level2 = RB2.isChecked();
             level3 = RB3.isChecked();
             level4 = RB4.isChecked();
-            level5 = RB5.isChecked();
-            if (level1 || level2 || level3 || level4 || level5){
-                if (!distanceEt.getText().toString().isEmpty()){
-                    distance = Integer.parseInt(distanceEt.getText().toString());
-                    key = dateFrormatFB+timeFormatStart;
-                    ic = new InviteClass(Uid, userName, userAddress, userCity, dateFormat, timeFormatStart, key,
-                            level1, level2, level3, level4, level5, distance);
-                    refInvites.child(Uid).child(key).setValue(ic);
-                    setResult(RESULT_OK, gi);
-                    finish();
+            if (level1 || level2 || level3 || level4){
+                if (gi.getStringExtra("uidEditKey") != null){
+                    key = gi.getStringExtra("uidEditKey");
+                    ic.setStartTime(timeFormatStart);
+                    ic.setLevel1(level1);
+                    ic.setLevel2(level2);
+                    ic.setLevel3(level3);
+                    ic.setLevel4(level4);
                 }
-                else Toast.makeText(this, "please enter distance", Toast.LENGTH_LONG).show();
+                else {
+                    key = dateFrormatFB + timeFormatStart;
+                    ic = new InviteClass(Uid, userName, userAddress, userCity, dateFormat, timeFormatStart, key,
+                            level1, level2, level3, level4);
+                }
+                refInvites.child(Uid).child(key).setValue(ic);
+                setResult(RESULT_OK, gi);
+                finish();
             }
             else Toast.makeText(this, "please click level", Toast.LENGTH_LONG).show();
         }
-        else {
-            Toast.makeText(this, "please check that all fields are right", Toast.LENGTH_LONG).show();
-        }
+        else Toast.makeText(this, "please check that all fields are right", Toast.LENGTH_LONG).show();
     }
 
     /**

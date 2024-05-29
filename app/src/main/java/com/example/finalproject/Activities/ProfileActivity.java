@@ -79,7 +79,6 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         yearsOfPlayTV = (TextView) findViewById(R.id.yearsOfPlayTV);
         yearsOfCoachingTV = (TextView) findViewById(R.id.yearsOfCoachingTV);
         coachTypeTV = (TextView) findViewById(R.id.coachTypeTV);
-        coachDesTV = (TextView) findViewById(R.id.coachDesTV);
         historyMatchesLV = (ListView) findViewById(R.id.historyMatchesLV);
         pfpIV = (ImageView) findViewById(R.id.pfpIV);
         coachLayout = (LinearLayout) findViewById(R.id.coachLayout);
@@ -112,12 +111,26 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     /**
      * On Click method Edit.
      *
-     * this method moves the user to Profile Activity to change his details.
+     * this method moves the user to Register Activity to change his details.
      * @param view the view
      */
     public void edit(View view) {
         Intent si = new Intent(this, RegisterActivity.class);
         si.putExtra("from profile", 1);
+        startActivity(si);
+    }
+
+    /**
+     * On Click method Edit.
+     *
+     * this method moves the user to JoinAsCoach Activity to change his details.
+     * @param view the view
+     */
+    public void editCoach(View view) {
+        Intent si = new Intent(this, RegisterActivity.class);
+        si.putExtra("from profile", 1);
+        si.putExtra("coaching years", currentUser.getUserCoach().getYearsOfCoaching());
+        si.putExtra("coach type", currentUser.getUserCoach().getCoachType());
         startActivity(si);
     }
 
@@ -216,7 +229,6 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
             layout.setBackgroundResource(R.drawable.profilecoach);
             coachLayout.setVisibility(coachLayout.VISIBLE);
             coachTypeTV.setText("coach type: " + '\n' + currentUser.getUserCoach().getCoachType());
-            coachDesTV.setText("coach description: " + '\n' + currentUser.getUserCoach().getDescription());
             yearsOfCoachingTV.setText("years of coaching: " + '\n' + currentUser.getUserCoach().getYearsOfCoaching());
         }
         titleTV.setText(currentUser.getUserName());

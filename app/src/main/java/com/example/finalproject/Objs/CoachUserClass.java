@@ -3,14 +3,12 @@ package com.example.finalproject.Objs;
 public class CoachUserClass{
     private int yearsOfCoaching;
     private String coachType;
-    private String description;
 
     private CoachUserClass(){}
 
-    public CoachUserClass(int yearsOfCoaching, String coachType, String description){
+    public CoachUserClass(int yearsOfCoaching, String coachType){
         this.yearsOfCoaching = yearsOfCoaching;
         this.coachType = coachType;
-        this.description = description;
     }
 
     public int getYearsOfCoaching() {
@@ -29,11 +27,4 @@ public class CoachUserClass{
         this.coachType = coachType;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

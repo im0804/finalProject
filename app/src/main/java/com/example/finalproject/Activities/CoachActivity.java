@@ -22,6 +22,7 @@ import android.widget.ListView;
 
 import com.example.finalproject.Adapters.CustomAdapterCoach;
 import com.example.finalproject.Adapters.CustomAdapterInvites;
+import com.example.finalproject.Objs.UserDistanceClass;
 import com.example.finalproject.R;
 import com.example.finalproject.Objs.UsersClass;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -36,11 +37,15 @@ import java.util.ArrayList;
  */
 public class CoachActivity extends AppCompatActivity {
     private ListView closeToYouLV;
-    private Button btnJoin;
+    private Button btnJoin, sortBTN;
+
+    boolean orderClass = false;
+
     Intent si;
     UsersClass user;
+    UserDistanceClass distance;
 
-    ArrayList<Float> arrDistance;
+    ArrayList<UserDistanceClass> arrDistance, arrSorted;
     ArrayList<UsersClass> arrUsers;
     CustomAdapterCoach customAdapterCoach;
 
@@ -55,10 +60,14 @@ public class CoachActivity extends AppCompatActivity {
         closeToYouLV = (ListView) findViewById(R.id.closeToYouLV);
         btnJoin = (Button) findViewById(R.id.btnJoin);
         btnJoin.setBackgroundColor(Color.TRANSPARENT);
-        arrDistance = new ArrayList<Float>();
+        sortBTN = (Button) findViewById(R.id.sortBTN);
+        sortBTN.setBackgroundColor(Color.TRANSPARENT);
+        arrDistance = new ArrayList<UserDistanceClass>();
+        arrSorted = new ArrayList<UserDistanceClass>();
         arrUsers = new ArrayList<UsersClass>();
 
-        customAdapterCoach = new CustomAdapterCoach(CoachActivity.this, arrUsers);
+
+        customAdapterCoach = new CustomAdapterCoach(CoachActivity.this, arrDistance);
         closeToYouLV.setAdapter(customAdapterCoach);
 
         refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
@@ -70,10 +79,10 @@ public class CoachActivity extends AppCompatActivity {
                     for (DataSnapshot data : dS.getChildren()) {
                         user = data.getValue(UsersClass.class);
                         if (user.isCoach() && !user.getUid().equals(Uid)){
-                            arrUsers.add(user);
                             tempLoc.setLatitude(user.getAddLatitude());
                             tempLoc.setLongitude(user.getAddLongitude());
-                            arrDistance.add(currentLoc.distanceTo(tempLoc));
+                            distance = new UserDistanceClass(user, currentLoc.distanceTo(tempLoc));
+                            arrDistance.add(distance);
                         }
                     }
                     customAdapterCoach.notifyDataSetChanged();
@@ -83,8 +92,28 @@ public class CoachActivity extends AppCompatActivity {
 
     }
 
-    public void sortUsersByDistance() {
+    /**
+     * on click sort method
+     * <p>
+     * @param    view the view
+     * sorts the coach users by distance from the current user
+     */
+    public void sortBTN(View view) {
+        if (orderClass) {
+            arrDistance.sort((o1, o2)
+                    -> o1.getDistance().compareTo(
+                    o2.getDistance()));
+            sortBTN.setText("Closest ↑");
+        } else {
+            arrDistance.sort((o1, o2)
+                    -> o2.getDistance().compareTo(
+                    o1.getDistance()));
+            sortBTN.setText("Closest ↓");
+        }
+        orderClass = !orderClass;
+        customAdapterCoach.notifyDataSetChanged();
     }
+
 
     /**
      * on click join method
@@ -142,5 +171,4 @@ public class CoachActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

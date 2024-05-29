@@ -83,9 +83,17 @@ public class LoginActivity extends AppCompatActivity {
                                     SharedPreferences.Editor editor=settings.edit();
                                     editor.putBoolean("stayConnect",conCB.isChecked());
                                     editor.commit();
-                                    //Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
-                                    Intent si = new Intent(LoginActivity.this, MainActivity.class);
-                                    startActivity(si);
+                                    //checks if user has finished register the last time he was in the app
+                                    Boolean isChecked = settings.getBoolean("registered",false);
+                                    if (!isChecked) {
+                                        Intent si = new Intent(LoginActivity.this, RegisterActivity.class);
+                                        startActivityForResult(si, 1);
+                                    }
+                                    else {
+                                        Intent si = new Intent(LoginActivity.this, MainActivity.class);
+                                        startActivity(si);
+                                    }
+
                                 } else {
                                     Toast.makeText(LoginActivity.this, "e-mail or password are wrong!", Toast.LENGTH_LONG).show();
                                 }

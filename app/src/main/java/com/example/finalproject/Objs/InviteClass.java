@@ -8,11 +8,10 @@ public class InviteClass {
     private String date;
     private String startTime;
     private String key;
-    private boolean level1, level2, level3, level4, level5;
-    private int distance;
+    private boolean level1, level2, level3, level4;
 
     public InviteClass(){}
-    public InviteClass(String Uid, String userName, String address, String city, String date, String start, String key, boolean level1, boolean level2, boolean level3, boolean level4, boolean level5, int distance){
+    public InviteClass(String Uid, String userName, String address, String city, String date, String start, String key, boolean level1, boolean level2, boolean level3, boolean level4){
         this.Uid = Uid;
         this.userName = userName;
         this.address = address;
@@ -24,8 +23,6 @@ public class InviteClass {
         this.level2 = level2;
         this.level3 = level3;
         this.level4 = level4;
-        this.level5 = level5;
-        this.distance = distance;
     }
 
 
@@ -83,22 +80,6 @@ public class InviteClass {
 
     public void setLevel4(boolean level4) {
         this.level4 = level4;
-    }
-
-    public boolean isLevel5() {
-        return level5;
-    }
-
-    public void setLevel5(boolean level5) {
-        this.level5 = level5;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
     }
 
     public String getUid() {

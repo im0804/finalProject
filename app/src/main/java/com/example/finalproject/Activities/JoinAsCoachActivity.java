@@ -32,13 +32,14 @@ import com.google.firebase.database.ValueEventListener;
  * here the user can join to the coaches community
  */
 public class JoinAsCoachActivity extends AppCompatActivity {
-    private EditText yearsOfCoachingEt, desET;
+    private EditText yearsOfCoachingEt;
     private RadioButton begCRB, groupsRB, competitiveRB, allRB;
     private Button btnFinish;
 
     String coachType;
 
     CoachUserClass userCoach;
+    Intent profileGI = getIntent();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,6 @@ public class JoinAsCoachActivity extends AppCompatActivity {
         setContentView(R.layout.activity_join_as_coach);
 
         yearsOfCoachingEt = (EditText) findViewById(R.id.yearsOfCoachingET);
-        desET = (EditText) findViewById(R.id.desEt);
         begCRB = (RadioButton) findViewById(R.id.begCRB);
         groupsRB = (RadioButton) findViewById(R.id.groupsRB);
         competitiveRB = (RadioButton) findViewById(R.id.competitiveRB);
@@ -54,7 +54,23 @@ public class JoinAsCoachActivity extends AppCompatActivity {
         btnFinish = (Button) findViewById(R.id.btnFinish);
 
         btnFinish.setBackgroundColor(Color.TRANSPARENT);
-
+        if (profileGI != null) {
+            if (profileGI.getIntExtra("from profile", -1) != -1){
+                yearsOfCoachingEt.setText(profileGI.getIntExtra("coaching years",-1));
+                if (profileGI.getStringExtra("coach type").equals("groups")){
+                    groupsRB.setChecked(true);
+                }
+                else if (profileGI.getStringExtra("coach type").equals("beginners")){
+                    begCRB.setChecked(true);
+                }
+                else if (profileGI.getStringExtra("coach type").equals("competitive")){
+                    competitiveRB.setChecked(true);
+                }
+                else if (profileGI.getStringExtra("coach type").equals("all levels")) {
+                    allRB.setChecked(true);
+                }
+            }
+        }
     }
 
 
@@ -66,7 +82,7 @@ public class JoinAsCoachActivity extends AppCompatActivity {
      * @param view the view
      */
     public void finishBTN(View view) {
-        if ((yearsOfCoachingEt.getText().toString().equals("")) || (desET.getText().toString().equals(""))){
+        if ((yearsOfCoachingEt.getText().toString().equals(""))){
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_LONG).show();
         }
         else {
@@ -80,7 +96,7 @@ public class JoinAsCoachActivity extends AppCompatActivity {
                 coachType = "all levels";
             }
             currentUser.setCoach(true);
-            userCoach = new CoachUserClass(Integer.parseInt(yearsOfCoachingEt.getText().toString()), coachType, desET.getText().toString());
+            userCoach = new CoachUserClass(Integer.parseInt(yearsOfCoachingEt.getText().toString()), coachType);
             currentUser = new UsersClass(currentUser, userCoach);
             refUsers.child(Uid).setValue(currentUser);
 

@@ -154,6 +154,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         invitesLV.setOnItemLongClickListener(this);
         closeMatchesLV.setOnItemLongClickListener(this);
 
+        pd = new ProgressDialog(MainActivity.this);
+        pd.setTitle("image download");
+        pd.setMessage("loading...");
+        pd.setCancelable(false);
+
         // Location permissions
         cancellationTokenSource = new CancellationTokenSource();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -243,6 +248,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             customAdapterInvites.notifyDataSetChanged();
                         }
                     });
+
+                    for (int i = 0; i < arrInvites.size(); i++) {
+                        if (arrInvites.get(i).isLevel1()){
+                            if (currentUser.getLevel() != 1){
+                                arrInvites.remove(i);
+                            }
+                        } else if (arrInvites.get(i).isLevel2()) {
+                            if (currentUser.getLevel() != 2){
+                                arrInvites.remove(i);
+                            }
+                        } else if (arrInvites.get(i).isLevel3()) {
+                            if (currentUser.getLevel() != 3) {
+                                arrInvites.remove(i);
+                            }
+                        } else if (arrInvites.get(i).isLevel4()) {
+                            if (currentUser.getLevel() != 4) {
+                                arrInvites.remove(i);
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -289,6 +314,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     btnReminder.setText(""+counterDP);
                     customAdapterCM.notifyDataSetChanged();
+                    pd.dismiss();
                 }
             }
         });
@@ -459,13 +485,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             btnReminder.setText(""+counterDP);
         }
 
+        //checks if the invitation has been done
         if (requestCode == REQUEST_CODE_INVITE && resultCode == RESULT_OK){
 
             // reading invites from database again after an new invitation is added
             refInvites.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
                 public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> tsk) {
-                    pd = ProgressDialog.show(MainActivity.this,"downloading data","downloading... \n it might take a minute",true);
                     if (tsk.isSuccessful()){
                         DataSnapshot dS = tsk.getResult();
                         arrInvites.clear();
@@ -487,7 +513,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         customAdapterUserInvites.notifyDataSetChanged();
                         customAdapterInvites.notifyDataSetChanged();
                     }
-                    pd.dismiss();
                 }
             });
         }
@@ -564,16 +589,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("Actions");
-        menu.add("delete");
+        menu.add("Delete");
+        menu.add("Edit");
     }
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         String i = item.getTitle().toString();
-        if (i.equals("delete")) {
+        if (i.equals("Delete")) {
             refInvites.child(Uid).child(userArrInvites.get(pos).getKey()).removeValue();
             userArrInvites.remove(pos);
             customAdapterUserInvites.notifyDataSetChanged();
+        }
+        if (i.equals("Edit")) {
+            Intent si = new Intent(MainActivity.this, InvitationActivity.class);
+            si.putExtra("uidEditKey", userArrInvites.get(pos).getKey());
+            startActivity(si);
         }
         return super.onContextItemSelected(item);
     }

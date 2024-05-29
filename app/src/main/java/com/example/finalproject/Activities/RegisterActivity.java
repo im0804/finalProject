@@ -13,6 +13,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,11 +34,13 @@ import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.example.finalproject.Objs.InviteClass;
 import com.example.finalproject.Objs.UsersClass;
 import com.example.finalproject.R;
 import com.example.finalproject.ReferencesFB;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
@@ -74,13 +77,15 @@ public class RegisterActivity extends AppCompatActivity {
     private Button nextBTN;
     private RadioButton begRB, amRB, advRB, tourRB;
 
-    int distance, age, yearsOfPlay, level;
+    int distance, age, yearsOfPlay, level, Gallery = 1;
     double longitude, latitude;
     String fullName, userName, address, city, gender, addressToConvert;
 
     UsersClass user;
+    InviteClass ic;
     Intent si, gi;
     AlertDialog.Builder adb;
+    ProgressDialog pd;
 
     public static StorageReference imageRef;
 
@@ -126,6 +131,11 @@ public class RegisterActivity extends AppCompatActivity {
                 startActivityForResult(intent, 100);
             }
         });
+
+        pd = new ProgressDialog(RegisterActivity.this);
+        pd.setTitle("image download");
+        pd.setMessage("loading...");
+        pd.setCancelable(false);
 
         // check Camera permissions
         if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -231,6 +241,29 @@ public class RegisterActivity extends AppCompatActivity {
             user = new UsersClass(Uid, fullName, userName, age, gender, address, latlng.latitude, latlng.longitude, city, level, yearsOfPlay, distance);
             refUsers.child(Uid).setValue(user);
             si = new Intent(this, MainActivity.class);
+
+            if (gi.getIntExtra("from profile", -1) != -1){
+                //updating new information for users invites as well
+                refInvites.child(Uid).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> tsk) {
+                        if (tsk.isSuccessful()) {
+                            DataSnapshot dS = tsk.getResult();
+                            for (DataSnapshot data : dS.getChildren()) {
+                                ic = data.getValue(InviteClass.class);
+                                ic.setAddress(address);
+                                ic.setUserName(userName);
+                                ic.setCity(city);
+                                refInvites.child(Uid).child(ic.getKey()).setValue(ic);
+                            }
+                        }
+                    }
+                });
+            }
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            SharedPreferences.Editor editor=settings.edit();
+            editor.putBoolean("registered", true);
+            editor.commit();
             startActivity(si);
         }
     }
@@ -286,10 +319,9 @@ public class RegisterActivity extends AppCompatActivity {
                 }
                 else {
                     //opens Gallery
-                    Intent galleryIntent = new Intent();
-                    galleryIntent.setAction(Intent.ACTION_PICK);
-                    galleryIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(galleryIntent, REQUEST_PICK_IMAGE);
+                    Intent si = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(si, Gallery);
                 }
             }
         });
@@ -337,7 +369,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         }
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_PICK_IMAGE) {
+            if (requestCode == Gallery) {
                 Uri file = data.getData();
                 if (file != null) {
                     final ProgressDialog pd=ProgressDialog.show(this,"Upload image","Uploading...",true);
@@ -347,11 +379,6 @@ public class RegisterActivity extends AppCompatActivity {
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                     pd.dismiss();
                                     Toast.makeText(RegisterActivity.this, "Image Uploaded", Toast.LENGTH_LONG).show();
-                                    try {
-                                        showPhoto();
-                                    } catch (IOException e) {
-                                        Toast.makeText(RegisterActivity.this, "didn't download", Toast.LENGTH_LONG).show();
-                                    }
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
@@ -361,6 +388,8 @@ public class RegisterActivity extends AppCompatActivity {
                                     Toast.makeText(RegisterActivity.this, "Upload failed", Toast.LENGTH_LONG).show();
                                 }
                             });
+                } else {
+                    Toast.makeText(this, "No Image was selected", Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -415,23 +444,23 @@ public class RegisterActivity extends AppCompatActivity {
      * @throws IOException the io exception
      */
     public void showPhoto() throws IOException {
-        final ProgressDialog pd = ProgressDialog.show(RegisterActivity.this, "Image download", "downloading...", true);
-        pd.setCancelable(false);
+        pd.show();
 
-        final File localFile = File.createTempFile(Uid,"jpeg");
+        final File localFile = File.createTempFile(Uid,"jpg");
         imageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                pd.dismiss();
+                Toast.makeText(RegisterActivity.this, "Image download success", Toast.LENGTH_LONG).show();
                 String filePath = localFile.getPath();
                 Bitmap bitmap = BitmapFactory.decodeFile(filePath);
                 pfpIB.setImageBitmap(bitmap);
-                pd.dismiss();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Toast.makeText(RegisterActivity.this, "Image download failed", Toast.LENGTH_LONG).show();
                 pd.dismiss();
+                Toast.makeText(RegisterActivity.this, "Image download failed", Toast.LENGTH_LONG).show();
             }
         });
     }

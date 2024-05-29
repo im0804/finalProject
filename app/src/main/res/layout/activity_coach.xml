@@ -22,22 +22,41 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="10" />
 
-        <Space
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3" />
+            android:layout_weight="10"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/textView12"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="4"
-            android:text="close coaches to you"
-            android:textStyle="bold"
-            android:textSize="18dp"
-            android:textColor="@color/black"/>
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="50"
+                android:text="close coaches to you"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
+
+            <Button
+                android:id="@+id/sortBTN"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="30"
+                android:onClick="sortBTN"
+                android:text="closest ↓"
+                android:textColor="@color/black"
+                android:textSize="15dp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <ListView
             android:id="@+id/closeToYouLV"
@@ -59,6 +78,11 @@
             android:textSize="18dp"
             android:textStyle="bold"
             android:textColor="@color/black"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2" />
 
         <Button
             android:id="@+id/btnJoin"

@@ -22,7 +22,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10" />
+            android:layout_weight="15" />
 
         <EditText
             android:id="@+id/yearsOfCoachingET"
@@ -39,7 +39,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="10" />
 
         <TextView
             android:id="@+id/textView15"
@@ -102,19 +102,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
-
-        <EditText
-            android:id="@+id/desEt"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="20"
-            android:ems="10"
-            android:hint="description of yourself"
-            android:inputType="text"
-            android:textStyle="bold"
-            android:textSize="16dp"
-            android:textColor="@color/black"/>
+            android:layout_weight="15" />
 
         <Button
             android:id="@+id/btnFinish"
