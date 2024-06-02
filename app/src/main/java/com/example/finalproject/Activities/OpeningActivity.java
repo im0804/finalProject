@@ -35,6 +35,8 @@ public class OpeningActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        //checks if the user chose to stay connected in his last entry
         SharedPreferences settings = getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
         Boolean isChecked = settings.getBoolean("stayConnect",false);
         Intent si = new Intent(OpeningActivity.this, MainActivity.class);

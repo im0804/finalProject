@@ -77,18 +77,22 @@ public class SignUpActivity extends AppCompatActivity {
                                     startActivity(si);
                                 }
                                 else {
-                                    Toast.makeText(SignUpActivity.this, "e-mail or password are wrong!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(SignUpActivity.this, "e-mail is wrong!", Toast.LENGTH_LONG).show();
                                     pd.dismiss();
                                 }
                             }
                             else {
-                                Toast.makeText(SignUpActivity.this, "There may already be an account with these details.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SignUpActivity.this, "Email or password are wrong.", Toast.LENGTH_SHORT).show();
                                 pd.dismiss();
                             }
                         }
                     });
     }
 
+    /**
+     * login method.
+     * this method moves the user to Login Activity when he clicks the 'login here' link.
+     */
     private void loginOption() {
         SpannableString ss = new SpannableString("Don't have an account?  Login here!");
         ClickableSpan span = new ClickableSpan() {

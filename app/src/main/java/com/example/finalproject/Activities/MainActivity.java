@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -202,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onStart() {
         super.onStart();
         counterDP = 0;
+
         // reading invites from database
         refInvites.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
@@ -250,20 +252,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     });
 
                     for (int i = 0; i < arrInvites.size(); i++) {
-                        if (arrInvites.get(i).isLevel1()){
-                            if (currentUser.getLevel() != 1){
+                        if (currentUser.getLevel() == 1){
+                            if (!arrInvites.get(i).isLevel1()){
                                 arrInvites.remove(i);
                             }
-                        } else if (arrInvites.get(i).isLevel2()) {
-                            if (currentUser.getLevel() != 2){
+                        } else if (currentUser.getLevel() == 2){
+                            if (!arrInvites.get(i).isLevel2()){
                                 arrInvites.remove(i);
                             }
-                        } else if (arrInvites.get(i).isLevel3()) {
-                            if (currentUser.getLevel() != 3) {
+                        } else if (currentUser.getLevel() == 3){
+                            if (!arrInvites.get(i).isLevel3()){
                                 arrInvites.remove(i);
                             }
-                        } else if (arrInvites.get(i).isLevel4()) {
-                            if (currentUser.getLevel() != 4) {
+                        } else if (currentUser.getLevel() == 4){
+                            if (!arrInvites.get(i).isLevel4()){
                                 arrInvites.remove(i);
                             }
                         }
@@ -330,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      */
     public boolean passedDate(String dateString, Calendar calNow) {
         long end = calNow.getTimeInMillis();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyyHH:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHH:mm");
         Date date = null;
         try {
             date = dateFormat.parse(dateString);
@@ -375,6 +377,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    /**
+     * method turn on GPS.
+     *
+     * this method check if phone's GPS is on, if not it turns it on.
+     */
     private void turnOnGPS() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
@@ -413,6 +420,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
+    /**
+     * method is GPS enabled.
+     *
+     * this method check if permissions for GPS are given.
+     */
     private boolean isGPSEnabled() {
         LocationManager locationManager = null;
         boolean isEnabled = false;
@@ -425,6 +437,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return isEnabled;
     }
 
+    /**
+     * method request permissions result.
+     *
+     * this method check if location permissions are given.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -552,7 +569,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             ad.show();
         }
 
-        // saves the chosen item so that the user can delete his invitation
+        // saves the chosen item position so that the user can delete his invitation in context menu
         if (parent.getId() == R.id.userInvitesLV) {
             pos = position;
 
@@ -630,9 +647,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Intent si = new Intent(this, CoachActivity.class);
             startActivity(si);
         }
-        else if(str.equals("register")){
-            Intent si = new Intent(this, RegisterActivity.class);
-            startActivity(si);
+        else if(str.equals("Log Out")){
+            mAuth.signOut();
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            SharedPreferences.Editor editor=settings.edit();
+            editor.putBoolean("stayConnected", false);
+            editor.commit();
+            MainActivity.this.startActivity(new Intent(MainActivity.this, OpeningActivity.class));
+            currentUser = null;
         }
         return super.onOptionsItemSelected(item);
     }

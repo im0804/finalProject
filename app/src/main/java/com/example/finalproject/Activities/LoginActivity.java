@@ -22,11 +22,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.finalproject.Objs.UsersClass;
 import com.example.finalproject.R;
 import com.example.finalproject.ReferencesFB;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.database.DataSnapshot;
 
 
 /**
@@ -42,6 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView regTV;
     private Button loginBTN;
 
+    UsersClass user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * the method checks whether the user is already registered.
-     * if so then it checks if the check button is checked and moves to the main activity
+     * if so then it checks if the 'stay connected' button is checked and moves to the main activity
      * if not then it saves the user in fireBase authentication and moves to register.
      *
      * @param view the view
@@ -68,8 +71,9 @@ public class LoginActivity extends AppCompatActivity {
     public void login(View view) {
         if (emailET.getText().toString().equals("") || passwordET.getText().toString().equals("")){
             Toast.makeText(this, "please fill in all fields", Toast.LENGTH_LONG).show();
-        }
-        else {
+        } else if (!isValidEmail(emailET.getText().toString())){
+            Toast.makeText(LoginActivity.this, "please enter a valid email", Toast.LENGTH_LONG).show();
+        } else {
             final ProgressDialog pd=ProgressDialog.show(this,"Logging Account","Logging in...",true);
             mAuth.signInWithEmailAndPassword(emailET.getText().toString(), passwordET.getText().toString())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -77,36 +81,39 @@ public class LoginActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             pd.dismiss();
                             if (task.isSuccessful()) {
-                                if (isValidEmail(emailET.getText().toString())){
-                                    ReferencesFB.getUser(mAuth.getCurrentUser());
-                                    SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-                                    SharedPreferences.Editor editor=settings.edit();
-                                    editor.putBoolean("stayConnect",conCB.isChecked());
-                                    editor.commit();
-                                    //checks if user has finished register the last time he was in the app
-                                    Boolean isChecked = settings.getBoolean("registered",false);
-                                    if (!isChecked) {
-                                        Intent si = new Intent(LoginActivity.this, RegisterActivity.class);
-                                        startActivityForResult(si, 1);
+                                ReferencesFB.getUser(mAuth.getCurrentUser());
+                                //checks if the user has finished registration or not
+                                refUsers.child(Uid).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DataSnapshot> tsk) {
+                                        if (tsk.isSuccessful()) {
+                                            user = tsk.getResult().getValue(UsersClass.class);
+                                            if (user == null){
+                                                Toast.makeText(LoginActivity.this, "please finish registering", Toast.LENGTH_LONG).show();
+                                                Intent si = new Intent(LoginActivity.this, RegisterActivity.class);
+                                                startActivity(si);
+                                            }
+                                            else{
+                                                SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+                                                SharedPreferences.Editor editor = settings.edit();
+                                                editor.putBoolean("stayConnect", conCB.isChecked());
+                                                editor.commit();
+                                                Intent si = new Intent(LoginActivity.this, MainActivity.class);
+                                                startActivity(si);
+                                            }
+                                        }
                                     }
-                                    else {
-                                        Intent si = new Intent(LoginActivity.this, MainActivity.class);
-                                        startActivity(si);
-                                    }
-
-                                } else {
-                                    Toast.makeText(LoginActivity.this, "e-mail or password are wrong!", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                            else {
-                                Toast.makeText(LoginActivity.this, "please enter a valid email or password.", Toast.LENGTH_LONG).show();
+                                });
                             }
                         }
                     });
         }
-
     }
 
+    /**
+     * signUp on click method.
+     * this method moves the user to Sign Up Activity when he clicks the 'sign up here' link.
+     */
     private void signUpOption() {
         SpannableString ss = new SpannableString("Don't have an account?  Sign Up here!");
         ClickableSpan span = new ClickableSpan() {

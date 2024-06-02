@@ -50,7 +50,7 @@ public class InvitationActivity extends AppCompatActivity {
 
     int year, month, day;
     boolean level1, level2, level3, level4;
-    boolean dateChoose = false, validTime = true;
+    boolean dateChoose = false, validTime = true, isSameDay = false;
     String timeFormatStart, dateFormat, dateFrormatFB, key;
 
     InviteClass ic;
@@ -79,6 +79,7 @@ public class InvitationActivity extends AppCompatActivity {
         calNow = Calendar.getInstance();
         gi = getIntent();
 
+        //initialize first look of activity layout
         SpannableString ss = new SpannableString("clear");
         ClickableSpan span = new ClickableSpan() {
             @Override
@@ -136,6 +137,7 @@ public class InvitationActivity extends AppCompatActivity {
     }
 
     private void showDatePickerDialog() {
+        //opens a date picker dialog and re-setting time
         startBTN.setClickable(false);
         startBTN.setText("Start Time");
         validTime = false;
@@ -157,15 +159,24 @@ public class InvitationActivity extends AppCompatActivity {
                         if (selectedDate.before(currentDate)) {
                             // Show a toast indicating that the selected date is invalid
                             Toast.makeText(InvitationActivity.this, "Please select a future date", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // saving the chosen date
+                        } else if (selectedDate.equals(currentDate)) {
+                            isSameDay = true;
                             dateFormat = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
-                            dateFrormatFB = String.format("%02d%02d%04d", dayOfMonth, monthOfYear+1, year);
+                            dateFrormatFB = String.format("%04d%02d%02d", year, monthOfYear+1, dayOfMonth);;
                             dateChoose = true;
                             startBTN.setClickable(true);
                             dateTV.setText(dateFormat);
                             startBTN.setText("start time");
-                        }
+                            } else {
+                                // saving the chosen date
+                                dateFormat = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+                                dateFrormatFB = String.format("%04d%02d%02d", year, monthOfYear+1, dayOfMonth);
+                                dateChoose = true;
+                                startBTN.setClickable(true);
+                                dateTV.setText(dateFormat);
+                                startBTN.setText("start time");
+                                isSameDay = false;
+                            }
                     }
                 }, year, month, day);
 
@@ -185,6 +196,7 @@ public class InvitationActivity extends AppCompatActivity {
      * @param view the view
      */
     public void createBtn(View view) {
+        //checks fields validity
         if (dateChoose && validTime) {
             level1 = RB1.isChecked();
             level2 = RB2.isChecked();
@@ -198,6 +210,7 @@ public class InvitationActivity extends AppCompatActivity {
                     ic.setLevel2(level2);
                     ic.setLevel3(level3);
                     ic.setLevel4(level4);
+                    setResult(RESULT_OK, gi);
                 }
                 else {
                     key = dateFrormatFB + timeFormatStart;
@@ -205,7 +218,6 @@ public class InvitationActivity extends AppCompatActivity {
                             level1, level2, level3, level4);
                 }
                 refInvites.child(Uid).child(key).setValue(ic);
-                setResult(RESULT_OK, gi);
                 finish();
             }
             else Toast.makeText(this, "please click level", Toast.LENGTH_LONG).show();
@@ -264,16 +276,20 @@ public class InvitationActivity extends AppCompatActivity {
             calSet.set(Calendar.SECOND, 0);
             calSet.set(Calendar.MILLISECOND, 0);
 
-            // checks if the chosen time is not in the past
-            long end = calNow.getTimeInMillis();
-            long start = calSet.getTimeInMillis();
-            if (TimeUnit.MILLISECONDS.toSeconds(end - start) > 0){
-                Toast.makeText(InvitationActivity.this, "please select a valid time.", Toast.LENGTH_SHORT).show();
-                startBTN.setText("start time");
-                validTime = false;
+            // checks if the chosen time is not in the past only if the chosen date is the current day
+            if (isSameDay){
+                long end = calNow.getTimeInMillis();
+                long start = calSet.getTimeInMillis();
+                if (TimeUnit.MILLISECONDS.toSeconds(end - start) > 0){
+                    Toast.makeText(InvitationActivity.this, "please select a valid time.", Toast.LENGTH_SHORT).show();
+                    startBTN.setText("start time");
+                    validTime = false;
+                }
+                else validTime = true;
             }
-            else validTime = true;
-
+            else {
+                validTime = true;
+            }
 
             if (dateChoose){
                 if (validTime){

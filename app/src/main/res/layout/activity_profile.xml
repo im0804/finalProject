@@ -5,9 +5,9 @@
     android:id="@+id/allLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/profilenocoach"
+    android:background="@drawable/nocoachprofile"
     android:layoutDirection="ltr"
-    tools:context=".Activities.ProfileActivity">
+    tools:context="com.example.finalproject.Activities.ProfileActivity">
 
     <Space
         android:layout_width="0dp"
@@ -90,14 +90,15 @@
                     android:layout_weight="5" />
 
                 <Button
-                    android:id="@+id/button"
+                    android:id="@+id/editCoach"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="20"
-                    android:background="#C1D9B7"
+                    android:onClick="editCoach"
+                    android:shadowColor="@color/black"
                     android:text="edit coach"
-                    android:textStyle="bold"
-                    android:onClick="editCoach" />
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
 
                 <Space
                     android:layout_width="match_parent"
@@ -120,7 +121,7 @@
                     android:id="@+id/pfpIV"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="34"
+                    android:layout_weight="30"
                     android:adjustViewBounds="true"
                     android:rotation="90" />
 

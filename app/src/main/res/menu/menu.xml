@@ -17,8 +17,8 @@
         android:orderInCategory="400" />
 
     <item
-        android:id="@+id/register"
-        android:title="register"
+        android:id="@+id/logOut"
+        android:title="Log Out"
         android:orderInCategory="500" />
 
 </menu>

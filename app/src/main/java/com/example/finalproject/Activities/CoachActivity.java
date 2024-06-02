@@ -11,12 +11,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -33,13 +37,14 @@ import java.util.ArrayList;
 
 /**
  * activity for coach user.
- * shows all the coach users.
+ * shows all users with coach attribute.
  */
-public class CoachActivity extends AppCompatActivity {
+public class CoachActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     private ListView closeToYouLV;
     private Button btnJoin, sortBTN;
 
     boolean orderClass = false;
+    int position;
 
     Intent si;
     UsersClass user;
@@ -51,6 +56,8 @@ public class CoachActivity extends AppCompatActivity {
 
     AlertDialog.Builder adb;
     Location tempLoc;
+
+    public static boolean cameFromCoach = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +76,10 @@ public class CoachActivity extends AppCompatActivity {
 
         customAdapterCoach = new CustomAdapterCoach(CoachActivity.this, arrDistance);
         closeToYouLV.setAdapter(customAdapterCoach);
+        closeToYouLV.setOnItemClickListener(this);
 
+        //reading all users with coach attribute and showing them in array list
+        //also, it calculates their distance from the current user and puts it into array list
         refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> tsk) {
@@ -81,6 +91,11 @@ public class CoachActivity extends AppCompatActivity {
                         if (user.isCoach() && !user.getUid().equals(Uid)){
                             tempLoc.setLatitude(user.getAddLatitude());
                             tempLoc.setLongitude(user.getAddLongitude());
+                            Log.i("distance", currentLoc.distanceTo(tempLoc)+"");
+                            Log.i("temp long", tempLoc.getLongitude()+"");
+                            Log.i("temp lat", tempLoc.getLatitude()+"");
+                            Log.i("current long", currentLoc.getLongitude()+"");
+                            Log.i("current lat", currentLoc.getLatitude()+"");
                             distance = new UserDistanceClass(user, currentLoc.distanceTo(tempLoc));
                             arrDistance.add(distance);
                         }
@@ -89,7 +104,6 @@ public class CoachActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     /**
@@ -149,6 +163,30 @@ public class CoachActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        this.position = position;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Actions");
+        menu.add("see profile");
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        String i = item.getTitle().toString();
+        if (i.equals("see profile")) {
+            Intent si = new Intent(CoachActivity.this, ProfileActivity.class);
+            si.putExtra("coachUid", arrDistance.get(position).getUser().getUid());
+            cameFromCoach = true;
+            startActivityForResult(si,150);
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         return super.onCreateOptionsMenu(menu);
@@ -168,6 +206,15 @@ public class CoachActivity extends AppCompatActivity {
         else if (str.equals("coach profile")){
             Intent si = new Intent(this, CoachActivity.class);
             startActivity(si);
+        }
+        else if(str.equals("Log Out")){
+            mAuth.signOut();
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            SharedPreferences.Editor editor=settings.edit();
+            editor.putBoolean("stayConnected", false);
+            editor.commit();
+            CoachActivity.this.startActivity(new Intent(CoachActivity.this, OpeningActivity.class));
+            currentUser = null;
         }
         return super.onOptionsItemSelected(item);
     }

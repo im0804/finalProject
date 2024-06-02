@@ -34,6 +34,7 @@ import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.example.finalproject.Objs.CoachUserClass;
 import com.example.finalproject.Objs.InviteClass;
 import com.example.finalproject.Objs.UsersClass;
 import com.example.finalproject.R;
@@ -79,10 +80,12 @@ public class RegisterActivity extends AppCompatActivity {
 
     int distance, age, yearsOfPlay, level, Gallery = 1;
     double longitude, latitude;
-    String fullName, userName, address, city, gender, addressToConvert;
+    String fullName, userName, address, city, gender, addressToConvert = null;
 
     UsersClass user;
+    CoachUserClass coachUser = null;
     InviteClass ic;
+    LatLng latlng;
     Intent si, gi;
     AlertDialog.Builder adb;
     ProgressDialog pd;
@@ -136,21 +139,12 @@ public class RegisterActivity extends AppCompatActivity {
         pd.setTitle("image download");
         pd.setMessage("loading...");
         pd.setCancelable(false);
-
-        // check Camera permissions
-        if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{android.Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-        }
-
-        // check Gallery permissions
-        if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE_PERMISSION);
-        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
         // check if user came from Profile Activity to change details
         if (gi.getIntExtra("from profile", -1) != -1) {
             Query query = refUsers
@@ -162,16 +156,21 @@ public class RegisterActivity extends AppCompatActivity {
                     if (dS.exists()) {
                         for (DataSnapshot data : dS.getChildren()) {
                             user = data.getValue(UsersClass.class);
+                            if (user.isCoach()){
+                                coachUser = user.getUserCoach();
+                            }
                             fullNameET.setText(user.getFullName());
                             userNameET.setText(user.getUserName());
                             distanceET.setText("" + user.getDistance());
                             ageET.setText("" + user.getAge());
                             addressET.setText("" + user.getAddressName());
                             yearsOfPlayET.setText("" + user.getYearsOfPlay());
-                            if (user.getGender() == "Female") {
-                                genderSW.setChecked(false);
-                            } else {
+                            city = user.getCity();
+                            latlng = new LatLng(user.getAddLatitude(),user.getAddLongitude());
+                            if (user.getGender().equals("Female")) {
                                 genderSW.setChecked(true);
+                            } else {
+                                genderSW.setChecked(false);
                             }
                             if (user.getLevel() == 1) {
                                 begRB.setChecked(true);
@@ -237,8 +236,14 @@ public class RegisterActivity extends AppCompatActivity {
                 gender = "Male";
             }
             ReferencesFB.getUser(mAuth.getCurrentUser());
-            LatLng latlng = getLocationFromAddress(RegisterActivity.this, addressToConvert);
+            if (addressToConvert != null){
+                latlng = getLocationFromAddress(RegisterActivity.this, addressToConvert);
+            }
             user = new UsersClass(Uid, fullName, userName, age, gender, address, latlng.latitude, latlng.longitude, city, level, yearsOfPlay, distance);
+            if (coachUser != null){
+                user.setUserCoach(coachUser);
+                user.setCoach(true);
+            }
             refUsers.child(Uid).setValue(user);
             si = new Intent(this, MainActivity.class);
 
@@ -260,14 +265,15 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 });
             }
-            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-            SharedPreferences.Editor editor=settings.edit();
-            editor.putBoolean("registered", true);
-            editor.commit();
             startActivity(si);
         }
     }
 
+    /**
+     * get location from address method
+     * <p>
+     * this method gets an address and converts it into coordinates of lat and long.
+     */
     private LatLng getLocationFromAddress(Context context, String address) throws IOException {
         //converting address to latitute and longitude object
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
@@ -283,7 +289,7 @@ public class RegisterActivity extends AppCompatActivity {
     /**
      * On Click method profile photo
      * <p>
-     *this method opens a dialog and checks if the user uploads a photo from Camera or Gallery.
+     * this method opens a dialog and checks if the user uploads a photo from Camera or Gallery.
      * if the user chose Camera, it opens the Camera and upload the photo to Firebase Storage.
      * if the user chose Gallery, it opens the Gallery and upload the photo to Firebase Storage.
      *
@@ -300,13 +306,11 @@ public class RegisterActivity extends AppCompatActivity {
                 if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{android.Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                 }
-                else{
-                    //opens Camera
-                    Intent takePicIntent = new Intent();
-                    takePicIntent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if (takePicIntent.resolveActivity(getPackageManager()) != null) {
-                        startActivityForResult(takePicIntent, REQUEST_IMAGE_CAPTURE);
-                    }
+                //opens Camera
+                Intent takePicIntent = new Intent();
+                takePicIntent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePicIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePicIntent, REQUEST_IMAGE_CAPTURE);
                 }
             }
         });
@@ -317,12 +321,10 @@ public class RegisterActivity extends AppCompatActivity {
                 if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE_PERMISSION);
                 }
-                else {
-                    //opens Gallery
-                    Intent si = new Intent(Intent.ACTION_PICK,
-                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(si, Gallery);
-                }
+                //opens Gallery
+                Intent si = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(si, Gallery);
             }
         });
         AlertDialog ad = adb.create();
@@ -397,10 +399,12 @@ public class RegisterActivity extends AppCompatActivity {
         // if chosen address from intent is valid, it saves into variables
         if (requestCode == 100 && resultCode == RESULT_OK){
             Place place = Autocomplete.getPlaceFromIntent(data);
-            addressToConvert = place.getAddress();
-            getAddressWithoutCountry(place);
-            latitude = place.getLatLng().latitude;
-            longitude = place.getLatLng().longitude;
+            if (place != null) {
+                addressToConvert = place.getAddress();
+                getAddressWithoutCountry(place);
+                latitude = place.getLatLng().latitude;
+                longitude = place.getLatLng().longitude;
+            }
         }
         else if(resultCode == AutocompleteActivity.RESULT_ERROR){
             Status status = Autocomplete.getStatusFromIntent(data);
@@ -460,7 +464,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 pd.dismiss();
-                Toast.makeText(RegisterActivity.this, "Image download failed", Toast.LENGTH_LONG).show();
+                pfpIB.setImageResource(R.drawable.pfp);
             }
         });
     }

@@ -1,5 +1,6 @@
 package com.example.finalproject.Activities;
 
+import static com.example.finalproject.Activities.CoachActivity.cameFromCoach;
 import static com.example.finalproject.Activities.MainActivity.currentUser;
 import static com.example.finalproject.ReferencesFB.*;
 
@@ -10,10 +11,12 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +31,7 @@ import android.widget.Toast;
 import com.example.finalproject.Adapters.CustomAdapterHistory;
 import com.example.finalproject.Objs.MatchClass;
 import com.example.finalproject.R;
+import com.example.finalproject.ReferencesFB;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -52,9 +56,10 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     private ListView historyMatchesLV;
     private ImageView pfpIV;
     private LinearLayout coachLayout, layout;
-    private Button editBTN;
+    private Button editBTN, editCoachBTN;
 
     MatchClass history;
+    Intent gi;
 
     ArrayList<MatchClass> arrHistory;
     CustomAdapterHistory historyCA;
@@ -85,6 +90,8 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         layout = (LinearLayout) findViewById(R.id.allLayout);
         coachLayout.setVisibility(coachLayout.GONE);
         titleTV = (TextView) findViewById(R.id.titleTV);
+        editCoachBTN = (Button) findViewById(R.id.editCoach);
+        editCoachBTN.setBackgroundColor(Color.rgb(193,219,180));
         editBTN = (Button) findViewById(R.id.editBTN);
         editBTN.setBackgroundColor(Color.TRANSPARENT);
 
@@ -104,8 +111,17 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onStart() {
         super.onStart();
-        userProfile(Uid);
 
+        //checks if the user came from coach activity to see other coaches profile
+        if (cameFromCoach){
+            Uid = gi.getStringExtra("coachUid");
+            cameFromCoach = false;
+            userProfile(Uid);
+        }
+        else {
+            ReferencesFB.getUser(mAuth.getCurrentUser());
+            userProfile(Uid);
+        }
     }
 
     /**
@@ -154,7 +170,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
             @Override
             public void onFailure(@NonNull Exception exception) {
                 pd.dismiss();
-                Toast.makeText(ProfileActivity.this, "Image download failed", Toast.LENGTH_LONG).show();
+                pfpIV.setImageResource(R.drawable.pfp);
             }
         });
     }
@@ -226,7 +242,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
             Toast.makeText(ProfileActivity.this, "Image failed", Toast.LENGTH_LONG).show();
         }
         if (currentUser.isCoach()) {
-            layout.setBackgroundResource(R.drawable.profilecoach);
+            layout.setBackgroundResource(R.drawable.coachprofile);
             coachLayout.setVisibility(coachLayout.VISIBLE);
             coachTypeTV.setText("coach type: " + '\n' + currentUser.getUserCoach().getCoachType());
             yearsOfCoachingTV.setText("years of coaching: " + '\n' + currentUser.getUserCoach().getYearsOfCoaching());
@@ -285,6 +301,15 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         else if (str.equals("coach profile")){
             Intent si = new Intent(this, CoachActivity.class);
             startActivity(si);
+        }
+        else if(str.equals("Log Out")){
+            mAuth.signOut();
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            SharedPreferences.Editor editor=settings.edit();
+            editor.putBoolean("stayConnected", false);
+            editor.commit();
+            ProfileActivity.this.startActivity(new Intent(ProfileActivity.this, OpeningActivity.class));
+            currentUser = null;
         }
         return super.onOptionsItemSelected(item);
     }

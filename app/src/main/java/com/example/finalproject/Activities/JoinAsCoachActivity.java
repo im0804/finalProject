@@ -54,6 +54,7 @@ public class JoinAsCoachActivity extends AppCompatActivity {
         btnFinish = (Button) findViewById(R.id.btnFinish);
 
         btnFinish.setBackgroundColor(Color.TRANSPARENT);
+        // checks if the user came from edit coach details in profile or from coach activity
         if (profileGI != null) {
             if (profileGI.getIntExtra("from profile", -1) != -1){
                 yearsOfCoachingEt.setText(profileGI.getIntExtra("coaching years",-1));

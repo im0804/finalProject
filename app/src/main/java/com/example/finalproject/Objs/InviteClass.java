@@ -113,4 +113,5 @@ public class InviteClass {
     public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
+
 }

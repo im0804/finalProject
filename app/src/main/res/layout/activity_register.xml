@@ -211,7 +211,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="10"
                     android:ems="10"
-                    android:hint="distance"
+                    android:hint="how far can you go? (km)"
                     android:inputType="numberSigned" />
 
                 <Space
