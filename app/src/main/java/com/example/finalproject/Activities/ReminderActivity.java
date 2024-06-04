@@ -21,6 +21,8 @@ import com.example.finalproject.Objs.MatchClass;
 import com.example.finalproject.R;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -37,11 +39,15 @@ public class ReminderActivity extends AppCompatActivity {
     int counter = 0, player1Sets=0, player2Sets=0, scoreCounter = 0;
     String userNameInviter, userNameInvited, date, winner;
 
+    Pattern pattern = Pattern.compile("\\d+");
+    Matcher matcher;
+
     MatchClass match;
     EndMatchClass endMatch = new EndMatchClass();
 
     ArrayList<MatchClass> arrHistory;
     ArrayList<String> score;
+    ArrayList<Integer> numbers;
 
     AlertDialog.Builder adb;
     Intent gi;
@@ -83,6 +89,8 @@ public class ReminderActivity extends AppCompatActivity {
         score = new ArrayList<String>();
 
         arrHistory = new ArrayList<MatchClass>();
+        score = new ArrayList<String>();
+        numbers = new ArrayList<Integer>();
         gi = getIntent();
     }
 
@@ -165,23 +173,42 @@ public class ReminderActivity extends AppCompatActivity {
         }
 
         if (allGood){
-            if (player1Sets > player2Sets){
-                winner = uid1TV.getText().toString();
-            }
-            else {
-                winner = uid2TV.getText().toString();
-            }
-            endMatch.setScore(score);
-            endMatch.setWinner(winner);
-            refNotPlayed.child(match.getUidInvited())
-                    .child(match.getKey())
-                    .removeValue();
-            match.setEndMatch(endMatch);
-            refPlayed.child(match.getUidInvited())
-                    .child(match.getKey())
-                    .setValue(match);
-            setResult(RESULT_OK, gi);
-            finish();
+            adb = new AlertDialog.Builder(this);
+            adb.setTitle("enter score");
+            adb.setMessage("are you sure you want to finish entering the score?");
+            adb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (player1Sets > player2Sets){
+                        winner = uid1TV.getText().toString();
+                    }
+                    else if (player1Sets < player2Sets){
+                        winner = uid2TV.getText().toString();
+                    }
+                    else{
+                        winner = "no one - it's a tie";
+                    }
+                    endMatch.setScore(score);
+                    endMatch.setWinner(winner);
+                    refNotPlayed.child(match.getUidInvited())
+                            .child(match.getKey())
+                            .removeValue();
+                    match.setEndMatch(endMatch);
+                    refPlayed.child(match.getUidInvited())
+                            .child(match.getKey())
+                            .setValue(match);
+                    setResult(RESULT_OK, gi);
+                    finish();
+                }
+            });
+            adb.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            AlertDialog ad = adb.create();
+            ad.show();
         }
         else {
             Toast.makeText(ReminderActivity.this, "check if all written sets are valid", Toast.LENGTH_LONG).show();

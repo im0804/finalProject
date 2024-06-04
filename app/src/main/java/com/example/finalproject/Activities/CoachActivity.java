@@ -29,6 +29,7 @@ import com.example.finalproject.Adapters.CustomAdapterInvites;
 import com.example.finalproject.Objs.UserDistanceClass;
 import com.example.finalproject.R;
 import com.example.finalproject.Objs.UsersClass;
+import com.example.finalproject.ReferencesFB;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -76,7 +77,8 @@ public class CoachActivity extends AppCompatActivity implements AdapterView.OnIt
 
         customAdapterCoach = new CustomAdapterCoach(CoachActivity.this, arrDistance);
         closeToYouLV.setAdapter(customAdapterCoach);
-        closeToYouLV.setOnItemClickListener(this);
+        closeToYouLV.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        closeToYouLV.setOnCreateContextMenuListener(this);
 
         //reading all users with coach attribute and showing them in array list
         //also, it calculates their distance from the current user and puts it into array list
@@ -208,13 +210,29 @@ public class CoachActivity extends AppCompatActivity implements AdapterView.OnIt
             startActivity(si);
         }
         else if(str.equals("Log Out")){
-            mAuth.signOut();
-            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-            SharedPreferences.Editor editor=settings.edit();
-            editor.putBoolean("stayConnected", false);
-            editor.commit();
-            CoachActivity.this.startActivity(new Intent(CoachActivity.this, OpeningActivity.class));
-            currentUser = null;
+            adb = new AlertDialog.Builder(this);
+            adb.setTitle("are you sure you want to log out?");
+            adb.setMessage("logging out will not remove all your data");
+            adb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    mAuth.signOut();
+                    SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                    SharedPreferences.Editor editor=settings.edit();
+                    editor.putBoolean("stayConnected", false);
+                    editor.commit();
+                    CoachActivity.this.startActivity(new Intent(CoachActivity.this, OpeningActivity.class));
+                    currentUser = null;
+                }
+            });
+            adb.setNegativeButton("No", new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            AlertDialog ad = adb.create();
+            ad.show();
         }
         return super.onOptionsItemSelected(item);
     }

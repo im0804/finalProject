@@ -1,6 +1,7 @@
 package com.example.finalproject.Activities;
 
 import static com.example.finalproject.Activities.CoachActivity.cameFromCoach;
+import static com.example.finalproject.Activities.MainActivity.arrUsers;
 import static com.example.finalproject.Activities.MainActivity.currentUser;
 import static com.example.finalproject.ReferencesFB.*;
 
@@ -17,6 +18,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +32,7 @@ import android.widget.Toast;
 
 import com.example.finalproject.Adapters.CustomAdapterHistory;
 import com.example.finalproject.Objs.MatchClass;
+import com.example.finalproject.Objs.UsersClass;
 import com.example.finalproject.R;
 import com.example.finalproject.ReferencesFB;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -51,7 +54,7 @@ import java.util.ArrayList;
  * @version 1
  * @since 24 /12/2023 the profile activity of the user.
  */
-public class ProfileActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener {
+public class ProfileActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     private TextView fullNameTV, userNameTV, distanceTV, ageTV, cityTV,genderTV, yearsOfPlayTV, yearsOfCoachingTV, coachTypeTV, coachDesTV, titleTV;
     private ListView historyMatchesLV;
     private ImageView pfpIV;
@@ -99,7 +102,6 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         historyCA = new CustomAdapterHistory(this, arrHistory);
         historyMatchesLV.setAdapter(historyCA);
         historyMatchesLV.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        historyMatchesLV.setOnItemLongClickListener(this);
 
         pd = new ProgressDialog(ProfileActivity.this);
         pd.setTitle("image download");
@@ -114,11 +116,14 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
 
         //checks if the user came from coach activity to see other coaches profile
         if (cameFromCoach){
+            historyMatchesLV.setOnItemClickListener(null);
+            gi = getIntent();
             Uid = gi.getStringExtra("coachUid");
             cameFromCoach = false;
             userProfile(Uid);
         }
         else {
+            historyMatchesLV.setOnItemClickListener(this);
             ReferencesFB.getUser(mAuth.getCurrentUser());
             userProfile(Uid);
         }
@@ -176,7 +181,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     }
 
     @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         adb = new AlertDialog.Builder(this);
         adb.setCancelable(false);
         // changing the profile to the chosen user' profile
@@ -186,7 +191,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
             adb.setPositiveButton("yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    userProfile(arrHistory.get(position).getUidInvited());
+
                     dialog.cancel();
                 }
             });
@@ -217,7 +222,6 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         }
         AlertDialog ad = adb.create();
         ad.show();
-        return true;
     }
 
     /**
@@ -229,26 +233,30 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     public void userProfile(String id){
         imageRef = imagesRef.child(id);
 
-        fullNameTV.setText("full name: " + '\n' + currentUser.getFullName());
-        userNameTV.setText("user name: " + '\n' + currentUser.getUserName());
-        distanceTV.setText("distance: " + '\n' + currentUser.getDistance());
-        ageTV.setText("age: " + currentUser.getAge());
-        genderTV.setText("gender: " + currentUser.getGender());
-        cityTV.setText("city: " + currentUser.getCity());
-        yearsOfPlayTV.setText("years of playing: " + '\n' + currentUser.getYearsOfPlay());
-        try {
-            showPhoto();
-        } catch (IOException e) {
-            Toast.makeText(ProfileActivity.this, "Image failed", Toast.LENGTH_LONG).show();
+        for (UsersClass user : arrUsers) {
+            if (user.getUid().equals(id)) {
+                fullNameTV.setText("full name: " + '\n' + user.getFullName());
+                userNameTV.setText("user name: " + '\n' + user.getUserName());
+                distanceTV.setText("distance: " + '\n' + user.getDistance());
+                ageTV.setText("age: " + user.getAge());
+                genderTV.setText("gender: " + user.getGender());
+                cityTV.setText("city: " + user.getCity());
+                yearsOfPlayTV.setText("years of playing: " + '\n' + user.getYearsOfPlay());
+                try {
+                    showPhoto();
+                } catch (IOException e) {
+                    Toast.makeText(ProfileActivity.this, "Image failed", Toast.LENGTH_LONG).show();
+                }
+                if (user.isCoach()) {
+                    layout.setBackgroundResource(R.drawable.coachprofile);
+                    coachLayout.setVisibility(coachLayout.VISIBLE);
+                    coachTypeTV.setText("coach type: " + '\n' + user.getUserCoach().getCoachType());
+                    yearsOfCoachingTV.setText("years of coaching: " + '\n' + user.getUserCoach().getYearsOfCoaching());
+                }
+                titleTV.setText(user.getUserName());
+                history(id);
+            }
         }
-        if (currentUser.isCoach()) {
-            layout.setBackgroundResource(R.drawable.coachprofile);
-            coachLayout.setVisibility(coachLayout.VISIBLE);
-            coachTypeTV.setText("coach type: " + '\n' + currentUser.getUserCoach().getCoachType());
-            yearsOfCoachingTV.setText("years of coaching: " + '\n' + currentUser.getUserCoach().getYearsOfCoaching());
-        }
-        titleTV.setText(currentUser.getUserName());
-        history(id);
     }
 
     /**
@@ -303,13 +311,29 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
             startActivity(si);
         }
         else if(str.equals("Log Out")){
-            mAuth.signOut();
-            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-            SharedPreferences.Editor editor=settings.edit();
-            editor.putBoolean("stayConnected", false);
-            editor.commit();
-            ProfileActivity.this.startActivity(new Intent(ProfileActivity.this, OpeningActivity.class));
-            currentUser = null;
+            adb = new AlertDialog.Builder(this);
+            adb.setTitle("are you sure you want to log out?");
+            adb.setMessage("logging out will not remove all your data");
+            adb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    mAuth.signOut();
+                    SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                    SharedPreferences.Editor editor=settings.edit();
+                    editor.putBoolean("stayConnected", false);
+                    editor.commit();
+                    ProfileActivity.this.startActivity(new Intent(ProfileActivity.this, OpeningActivity.class));
+                    currentUser = null;
+                }
+            });
+            adb.setNegativeButton("No", new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            AlertDialog ad = adb.create();
+            ad.show();
         }
         return super.onOptionsItemSelected(item);
     }

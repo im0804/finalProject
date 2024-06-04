@@ -58,10 +58,7 @@ public class CustomAdapterHistory extends BaseAdapter {
                     + arrHistory.get(position).getUserNameInvited());
             score = "";
             for (int i = 0; i < arrHistory.get(position).getEndMatch().getScore().size();i++) {
-                Log.e("i", i + "");
-                Log.e("array", arrHistory.get(position).getEndMatch().getScore().get(i) + " ");
-                Log.e("size", arrHistory.get(position).getEndMatch().getScore().size() + " ");
-                score += arrHistory.get(position).getEndMatch().getScore().get(i) + " ";
+                score += arrHistory.get(position).getEndMatch().getScore().get(i) + "  ";
             }
             viewholder.tvScore.setText(score);
             viewholder.tvWinner.setText("winner: " + arrHistory.get(position).getEndMatch().getWinner());

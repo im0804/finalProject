@@ -50,42 +50,64 @@
             android:layout_height="0dp"
             android:layout_weight="3" />
 
-        <TextView
-            android:id="@+id/textView8"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="6"
-            android:text="Invites"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            android:textColor="@color/black"/>
+            android:layout_weight="40"
+            android:orientation="horizontal">
 
-        <ListView
-            android:id="@+id/invitesLV"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="30" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="50"
+                android:orientation="vertical">
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="6"
+                    android:text="Invites"
+                    android:textColor="@color/black"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/textView16"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="6"
-            android:text="My Invites"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            android:textColor="@color/black"/>
+                <ListView
+                    android:id="@+id/invitesLV"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="30" />
+            </LinearLayout>
 
-        <ListView
-            android:id="@+id/userInvitesLV"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="15" />
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="50"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView16"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="3"
+                    android:text="My Invites"
+                    android:textColor="@color/black"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+
+                <ListView
+                    android:id="@+id/userInvitesLV"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="15" />
+            </LinearLayout>
+
+        </LinearLayout>
 
         <Space
             android:layout_width="match_parent"
@@ -106,7 +128,7 @@
             android:id="@+id/closeMatchesLV"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="30" />
+            android:layout_weight="40" />
 
         <LinearLayout
             android:layout_width="match_parent"

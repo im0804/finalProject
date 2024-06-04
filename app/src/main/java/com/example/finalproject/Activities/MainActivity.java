@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ArrayList<Double> arrLatlngs;
     ArrayList<Float> arrDistance;
     ArrayList<String> arrUids;
+    public static ArrayList<UsersClass> arrUsers;
 
     LocationRequest locationRequest;
     FusedLocationProviderClient fusedLocationClient;
@@ -135,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         arrLatlngs = new ArrayList<Double>();
         arrDistance = new ArrayList<Float>();
         arrUids = new ArrayList<String>();
+        arrUsers = new ArrayList<UsersClass>();
 
         ReferencesFB.getUser(mAuth.getCurrentUser());
         user = new UsersClass();
@@ -180,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     DataSnapshot dS = tsk.getResult();
                     for (DataSnapshot data : dS.getChildren()) {
                         user = data.getValue(UsersClass.class);
+                        arrUsers.add(user);
                         if (user.getUid().equals(Uid)) {
                             userDis = user.getDistance() * 1000;
                             userName = user.getUserName();
@@ -602,6 +605,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return true;
     }
 
+    // disables the back button
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -648,13 +656,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             startActivity(si);
         }
         else if(str.equals("Log Out")){
-            mAuth.signOut();
-            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-            SharedPreferences.Editor editor=settings.edit();
-            editor.putBoolean("stayConnected", false);
-            editor.commit();
-            MainActivity.this.startActivity(new Intent(MainActivity.this, OpeningActivity.class));
-            currentUser = null;
+            adb = new AlertDialog.Builder(this);
+            adb.setTitle("are you sure you want to log out?");
+            adb.setMessage("logging out will not remove all your data");
+            adb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    mAuth.signOut();
+                    SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                    SharedPreferences.Editor editor=settings.edit();
+                    editor.putBoolean("stayConnected", false);
+                    editor.commit();
+                    MainActivity.this.startActivity(new Intent(MainActivity.this, OpeningActivity.class));
+                    currentUser = null;
+                }
+            });
+            adb.setNegativeButton("No", new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            AlertDialog ad = adb.create();
+            ad.show();
         }
         return super.onOptionsItemSelected(item);
     }
