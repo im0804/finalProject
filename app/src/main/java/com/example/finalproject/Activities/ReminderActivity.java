@@ -39,15 +39,10 @@ public class ReminderActivity extends AppCompatActivity {
     int counter = 0, player1Sets=0, player2Sets=0, scoreCounter = 0;
     String userNameInviter, userNameInvited, date, winner;
 
-    Pattern pattern = Pattern.compile("\\d+");
-    Matcher matcher;
-
     MatchClass match;
     EndMatchClass endMatch = new EndMatchClass();
 
-    ArrayList<MatchClass> arrHistory;
     ArrayList<String> score;
-    ArrayList<Integer> numbers;
 
     AlertDialog.Builder adb;
     Intent gi;
@@ -88,9 +83,6 @@ public class ReminderActivity extends AppCompatActivity {
 
         score = new ArrayList<String>();
 
-        arrHistory = new ArrayList<MatchClass>();
-        score = new ArrayList<String>();
-        numbers = new ArrayList<Integer>();
         gi = getIntent();
     }
 

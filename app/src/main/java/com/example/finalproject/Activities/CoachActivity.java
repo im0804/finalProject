@@ -119,12 +119,12 @@ public class CoachActivity extends AppCompatActivity implements AdapterView.OnIt
             arrDistance.sort((o1, o2)
                     -> o1.getDistance().compareTo(
                     o2.getDistance()));
-            sortBTN.setText("Closest ↑");
+            sortBTN.setText("Closest");
         } else {
             arrDistance.sort((o1, o2)
                     -> o2.getDistance().compareTo(
                     o1.getDistance()));
-            sortBTN.setText("Closest ↓");
+            sortBTN.setText("farthest");
         }
         orderClass = !orderClass;
         customAdapterCoach.notifyDataSetChanged();

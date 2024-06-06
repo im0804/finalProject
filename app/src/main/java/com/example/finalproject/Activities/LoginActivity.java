@@ -13,6 +13,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginBTN;
 
     UsersClass user;
+    Intent si;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,17 +92,16 @@ public class LoginActivity extends AppCompatActivity {
                                             user = tsk.getResult().getValue(UsersClass.class);
                                             if (user == null){
                                                 Toast.makeText(LoginActivity.this, "please finish registering", Toast.LENGTH_LONG).show();
-                                                Intent si = new Intent(LoginActivity.this, RegisterActivity.class);
-                                                startActivity(si);
+                                                si = new Intent(LoginActivity.this, RegisterActivity.class);
                                             }
                                             else{
                                                 SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
                                                 SharedPreferences.Editor editor = settings.edit();
                                                 editor.putBoolean("stayConnect", conCB.isChecked());
                                                 editor.commit();
-                                                Intent si = new Intent(LoginActivity.this, MainActivity.class);
-                                                startActivity(si);
+                                                si = new Intent(LoginActivity.this, MainActivity.class);
                                             }
+                                            startActivity(si);
                                         }
                                     }
                                 });
@@ -122,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
         ClickableSpan span = new ClickableSpan() {
             @Override
             public void onClick(View textView) {
-                Intent si = new Intent(LoginActivity.this, SignUpActivity.class);
+                si = new Intent(LoginActivity.this, SignUpActivity.class);
                 startActivity(si);
             }
         };

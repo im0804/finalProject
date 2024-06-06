@@ -117,6 +117,8 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         //checks if the user came from coach activity to see other coaches profile
         if (cameFromCoach){
             historyMatchesLV.setOnItemClickListener(null);
+            editCoachBTN.setVisibility(View.INVISIBLE);
+            editBTN.setVisibility(View.INVISIBLE);
             gi = getIntent();
             Uid = gi.getStringExtra("coachUid");
             cameFromCoach = false;
@@ -209,7 +211,8 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     userProfile(arrHistory.get(position).getUidInviter());
-                    editBTN.setVisibility(View.GONE);
+                    editBTN.setVisibility(View.INVISIBLE);
+                    editBTN.setVisibility(View.INVISIBLE);
                     dialog.cancel();
                 }
             });

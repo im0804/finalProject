@@ -4,6 +4,7 @@ import static com.example.finalproject.ReferencesFB.*;
 import static com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -174,6 +175,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         }
 
+        onBackPressed();
+
         // reading user information from database
         refUsers.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
@@ -184,11 +187,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         user = data.getValue(UsersClass.class);
                         arrUsers.add(user);
                         if (user.getUid().equals(Uid)) {
-                            userDis = user.getDistance() * 1000;
-                            userName = user.getUserName();
-                            userCity = user.getCity();
-                            userAddress = user.getAddressName();
-                            currentUser = user;
+                            if (user == null){
+                                Toast.makeText(MainActivity.this, "please finish registering", Toast.LENGTH_LONG).show();
+                                Intent si = new Intent(MainActivity.this, RegisterActivity.class);
+                                startActivity(si);
+                            } else{
+                                userDis = user.getDistance() * 1000;
+                                userName = user.getUserName();
+                                userCity = user.getCity();
+                                userAddress = user.getAddressName();
+                                currentUser = user;
+                            }
                         } else {
                             arrUids.add(user.getUid());
                             arrLatlngs.add(user.getAddLatitude());
@@ -254,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         }
                     });
 
+                    //sort by level
                     for (int i = 0; i < arrInvites.size(); i++) {
                         if (currentUser.getLevel() == 1){
                             if (!arrInvites.get(i).isLevel1()){
@@ -273,6 +283,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             }
                         }
                     }
+
+                    //sort by date
+                    arrInvites.sort((o1, o2)
+                            -> o1.getKey().compareTo(
+                            o2.getKey()));
+                    customAdapterInvites.notifyDataSetChanged();
                 }
             }
         });
@@ -307,6 +323,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             }
                         }
                     }
+                    //sort by date
+                    arrMatches.sort((o1, o2)
+                            -> o1.getKey().compareTo(
+                            o2.getKey()));
                     customAdapterCM.notifyDataSetChanged();
 
                     //checks if close match date has passed
@@ -323,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
+
     }
 
     /**
@@ -606,8 +627,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     // disables the back button
+    @SuppressLint("MissingSuperCall")
+    @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        // disable the back button
     }
 
     @Override

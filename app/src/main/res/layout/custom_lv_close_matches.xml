@@ -53,15 +53,6 @@
             android:textSize="14dp"
             android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/LocationTV1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="20"
-            android:text="location"
-            android:textSize="14dp"
-            android:textStyle="bold"/>
-
     </LinearLayout>
 
     <Space

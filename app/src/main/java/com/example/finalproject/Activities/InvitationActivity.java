@@ -117,13 +117,13 @@ public class InvitationActivity extends AppCompatActivity {
                         for (DataSnapshot data : dS.getChildren()) {
                             ic = data.getValue(InviteClass.class);
                             startBTN.setText(ic.getStartTime());
-                            if (level1)
+                            if (ic.isLevel1())
                                 RB1.setChecked(true);
-                            if (level2)
+                            if (ic.isLevel2())
                                 RB2.setChecked(true);
-                            if (level3)
+                            if (ic.isLevel3())
                                 RB3.setChecked(true);
-                            if (level4)
+                            if (ic.isLevel4())
                                 RB4.setChecked(true);
                             dateTV.setText(ic.getDate());
                             dateTV.setEnabled(false);
