@@ -2,11 +2,13 @@ package com.example.finalproject.Activities;
 
 import static com.example.finalproject.Activities.MainActivity.currentUser;
 import static com.example.finalproject.ReferencesFB.Uid;
+import static com.example.finalproject.ReferencesFB.refInvites;
 import static com.example.finalproject.ReferencesFB.refUsers;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -19,8 +21,10 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.example.finalproject.Objs.CoachUserClass;
+import com.example.finalproject.Objs.InviteClass;
 import com.example.finalproject.R;
 import com.example.finalproject.Objs.UsersClass;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
@@ -38,8 +42,10 @@ public class JoinAsCoachActivity extends AppCompatActivity {
 
     String coachType;
 
+    UsersClass user;
     CoachUserClass userCoach;
-    Intent profileGI = getIntent();
+    Intent profileGI;
+    ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,26 +58,40 @@ public class JoinAsCoachActivity extends AppCompatActivity {
         competitiveRB = (RadioButton) findViewById(R.id.competitiveRB);
         allRB = (RadioButton) findViewById(R.id.allRB);
         btnFinish = (Button) findViewById(R.id.btnFinish);
+        profileGI = getIntent();
+        pd = new ProgressDialog(JoinAsCoachActivity.this);
+        pd.setTitle("downloading info");
+        pd.setMessage("loading...");
+        pd.setCancelable(false);
+        pd.show();
 
         btnFinish.setBackgroundColor(Color.TRANSPARENT);
         // checks if the user came from edit coach details in profile or from coach activity
         if (profileGI != null) {
-            if (profileGI.getIntExtra("from profile", -1) != -1){
-                yearsOfCoachingEt.setText(profileGI.getIntExtra("coaching years",-1));
-                if (profileGI.getStringExtra("coach type").equals("groups")){
-                    groupsRB.setChecked(true);
-                }
-                else if (profileGI.getStringExtra("coach type").equals("beginners")){
-                    begCRB.setChecked(true);
-                }
-                else if (profileGI.getStringExtra("coach type").equals("competitive")){
-                    competitiveRB.setChecked(true);
-                }
-                else if (profileGI.getStringExtra("coach type").equals("all levels")) {
-                    allRB.setChecked(true);
-                }
+            if (profileGI.getIntExtra("from profile", -1) == 1){
+                refUsers.child(Uid).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<DataSnapshot> tsk) {
+                        if (tsk.isSuccessful()) {
+                            DataSnapshot dS = tsk.getResult();
+                            user = dS.getValue(UsersClass.class);
+                            yearsOfCoachingEt.setText(user.getUserCoach().getYearsOfCoaching()+"");
+                            if (user.getUserCoach().getCoachType().equals("groups")) {
+                                groupsRB.setChecked(true);
+                            } else if (user.getUserCoach().getCoachType().equals("beginners")) {
+                                begCRB.setChecked(true);
+                            } else if (user.getUserCoach().getCoachType().equals("competitive")) {
+                                competitiveRB.setChecked(true);
+                            } else if (user.getUserCoach().getCoachType().equals("all levels")) {
+                                allRB.setChecked(true);
+                            }
+                        pd.dismiss();
+                        }
+                    }
+                });
             }
         }
+        pd.dismiss();
     }
 
 

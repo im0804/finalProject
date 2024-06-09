@@ -144,17 +144,15 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     }
 
     /**
-     * On Click method Edit.
+     * On Click method coach edit.
      *
      * this method moves the user to JoinAsCoach Activity to change his details.
      * @param view the view
      */
     public void editCoach(View view) {
-        Intent si = new Intent(this, RegisterActivity.class);
+        Intent si = new Intent(this, JoinAsCoachActivity.class);
         si.putExtra("from profile", 1);
-        si.putExtra("coaching years", currentUser.getUserCoach().getYearsOfCoaching());
-        si.putExtra("coach type", currentUser.getUserCoach().getCoachType());
-        startActivity(si);
+        startActivityForResult(si, -1);
     }
 
     /**
