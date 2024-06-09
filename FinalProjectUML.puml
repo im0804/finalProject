@@ -1,0 +1,493 @@
+@startuml
+class com.example.finalproject.Objs.EndMatchClass {
+- ArrayList<String> score
+- String winner
++ ArrayList<String> getScore()
++ void setScore(ArrayList<String>)
++ String getWinner()
++ void setWinner(String)
+}
+
+
+class com.example.finalproject.Activities.ReminderActivity {
+- TextView uid1TV
+- EditText set11ET
+- Button btnDelete
+~ boolean allGood
+~ int counter
+~ String userNameInviter
+~ MatchClass match
+~ EndMatchClass endMatch
+~ ArrayList<String> score
+~ AlertDialog.Builder adb
+~ Intent gi
+# void onCreate(Bundle)
+# void onStart()
++ void closeMatch(View)
++ boolean checkScore(EditText,EditText)
++ void addSet(View)
++ void delete(View)
++ {static} boolean isLegalScore(String,String)
+}
+
+
+class com.example.finalproject.Adapters.CustomAdapterUserInvites {
+- Context context
+- ArrayList<InviteClass> userArrInvites
+- LayoutInflater inflater
++ int getCount()
++ Object getItem(int)
++ long getItemId(int)
++ View getView(int,View,ViewGroup)
+}
+
+
+class com.example.finalproject.Adapters.CustomAdapterUserInvites$ViewHolder {
+~ TextView tvDate
+}
+
+class com.example.finalproject.Activities.RegisterActivity {
+- EditText fullNameET
+- Switch genderSW
+- ImageButton pfpIB
+- Button nextBTN
+- RadioButton begRB
+~ int distance
+~ double longitude
+~ String fullName
+~ UsersClass user
+~ CoachUserClass coachUser
+~ InviteClass ic
+~ LatLng latlng
+~ Intent si
+~ AlertDialog.Builder adb
+~ ProgressDialog pd
++ {static} StorageReference imageRef
+# void onCreate(Bundle)
+# void onStart()
++ void next(View)
+- LatLng getLocationFromAddress(Context,String)
++ void pfp(View)
+# void onActivityResult(int,int,Intent)
+- void getAddressWithoutCountry(Place)
++ void onRequestPermissionsResult(int,String[],int[])
++ void showPhoto()
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
+}
+
+
+class com.example.finalproject.Objs.InviteClass {
+- String Uid
+- String userName
+- String address
+- String city
+- String date
+- String startTime
+- String key
+- boolean level1
++ String getCity()
++ void setCity(String)
++ String getDate()
++ String getKey()
++ void setKey(String)
++ void setDate(String)
++ boolean isLevel1()
++ void setLevel1(boolean)
++ boolean isLevel2()
++ void setLevel2(boolean)
++ boolean isLevel3()
++ void setLevel3(boolean)
++ boolean isLevel4()
++ void setLevel4(boolean)
++ String getUid()
++ void setUid(String)
++ String getUserName()
++ void setUserName(String)
++ String getAddress()
++ void setAddress(String)
++ String getStartTime()
++ void setStartTime(String)
+}
+
+
+class com.example.finalproject.Objs.UsersClass {
+- String Uid
+- String fullName
+- String userName
+- int age
+- String gender
+- int level
+- String addressName
+- double addLatitude
+- double addLongitude
+- String city
+- int yearsOfPlay
+- int distance
+- boolean isCoach
+- CoachUserClass userCoach
++ String getUid()
++ void setUid(String)
++ String getFullName()
++ void setFullName(String)
++ String getUserName()
++ void setUserName(String)
++ int getAge()
++ void setAge(int)
++ String getGender()
++ void setGender(String)
++ String getAddressName()
++ void setAddressName(String)
++ double getAddLatitude()
++ void setAddLatitude(double)
++ double getAddLongitude()
++ void setAddLongitude(double)
++ int getLevel()
++ void setLevel(int)
++ int getYearsOfPlay()
++ void setYearsOfPlay(int)
++ int getDistance()
++ void setDistance(int)
++ String getCity()
++ void setCity(String)
++ boolean isCoach()
++ void setCoach(boolean)
++ CoachUserClass getUserCoach()
++ void setUserCoach(CoachUserClass)
+}
+
+
+class com.example.finalproject.Adapters.CustomAdapterCoach {
+- Context context
+- ArrayList<UserDistanceClass> arrCoaches
+- LayoutInflater inflater
++ int getCount()
++ Object getItem(int)
++ long getItemId(int)
++ View getView(int,View,ViewGroup)
+}
+
+
+class com.example.finalproject.Adapters.CustomAdapterCoach$ViewHolder {
+~ TextView tvUsername
+}
+
+class com.example.finalproject.Objs.MatchClass {
+- String uidInviter
+- String uidInvited
+- String userNameInviter
+- String userNameInvited
+- String date
+- String hour
+- String key
+- EndMatchClass endMatch
++ String getKey()
++ void setKey(String)
++ String getUidInviter()
++ void setUidInviter(String)
++ String getUidInvited()
++ void setUidInvited(String)
++ String getDate()
++ void setDate(String)
++ String getHour()
++ void setHour(String)
++ EndMatchClass getEndMatch()
++ void setEndMatch(EndMatchClass)
++ String getUserNameInviter()
++ void setUserNameInviter(String)
++ String getUserNameInvited()
++ void setUserNameInvited(String)
+}
+
+
+class com.example.finalproject.Objs.CoachUserClass {
+- int yearsOfCoaching
+- String coachType
++ int getYearsOfCoaching()
++ void setYearsOfPlay(int)
++ String getCoachType()
++ void setCoachType(String)
+}
+
+
+class com.example.finalproject.Adapters.CustomAdapterInvites {
+- Context context
+- ArrayList<InviteClass> arrInvites
+- LayoutInflater inflater
++ int getCount()
++ Object getItem(int)
++ long getItemId(int)
++ View getView(int,View,ViewGroup)
+}
+
+
+class com.example.finalproject.Adapters.CustomAdapterInvites$ViewHolder {
+~ TextView tvUserName
+}
+
+class com.example.finalproject.Activities.ProfileActivity {
+- TextView fullNameTV
+- ListView historyMatchesLV
+- ImageView pfpIV
+- LinearLayout coachLayout
+- Button editBTN
+~ MatchClass history
+~ Intent gi
+~ ArrayList<MatchClass> arrHistory
+~ CustomAdapterHistory historyCA
+~ AlertDialog.Builder adb
+~ ProgressDialog pd
+~ StorageReference imageRef
+# void onCreate(Bundle)
+# void onStart()
++ void edit(View)
++ void editCoach(View)
++ void showPhoto()
++ void onItemClick(AdapterView<?>,View,int,long)
++ void userProfile(String)
++ void history(String)
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
+}
+
+
+class com.example.finalproject.Activities.LoginActivity {
+- EditText emailET
+- CheckBox conCB
+- TextView regTV
+- Button loginBTN
+~ UsersClass user
+~ Intent si
+# void onCreate(Bundle)
++ void login(View)
+- void signUpOption()
+}
+
+
+class com.example.finalproject.Activities.MainActivity {
+- ListView invitesLV
+- Button btnReminder
+~ int pos
+~ UsersClass user
+~ InviteClass invite
+~ MatchClass match
+~ Intent si
+~ AlertDialog.Builder adb
+~ Calendar calNow
+~ ProgressDialog pd
+~ CustomAdapterInvites customAdapterInvites
+~ CustomAdapterUserInvites customAdapterUserInvites
+~ CustomAdapterCM customAdapterCM
+~ ArrayList<InviteClass> arrInvites
+~ ArrayList<MatchClass> arrMatches
+~ ArrayList<String> arrAddresses
+~ ArrayList<Double> arrLatlngs
+~ ArrayList<Float> arrDistance
+~ ArrayList<String> arrUids
++ {static} ArrayList<UsersClass> arrUsers
+~ LocationRequest locationRequest
+~ FusedLocationProviderClient fusedLocationClient
+~ Location addressLoc
+~ CancellationTokenSource cancellationTokenSource
+~ Task<Location> currentLocationTask
++ {static} ArrayList<MatchClass> arrPassed
++ {static} String userName
++ {static} int userDis
++ {static} UsersClass currentUser
++ {static} Location currentLoc
+# void onCreate(Bundle)
+# void onStart()
++ boolean passedDate(String,Calendar)
++ void withinRange(Location,ArrayList<Double>)
+- void turnOnGPS()
+- boolean isGPSEnabled()
++ void onRequestPermissionsResult(int,String[],int[])
++ void addAGame(View)
++ void remind(View)
+# void onActivityResult(int,int,Intent)
++ boolean onItemLongClick(AdapterView<?>,View,int,long)
++ void onBackPressed()
++ void onCreateContextMenu(ContextMenu,View,ContextMenu.ContextMenuInfo)
++ boolean onContextItemSelected(MenuItem)
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
+}
+
+
+class com.example.finalproject.Activities.OpeningActivity {
+- Button loginBTN
+# void onCreate(Bundle)
+# void onStart()
++ void signUp(View)
++ void login(View)
+}
+
+
+class com.example.finalproject.Adapters.CustomAdapterCM {
+- Context context
+- ArrayList<MatchClass> arrMatches
+- LayoutInflater inflater
++ int getCount()
++ Object getItem(int)
++ long getItemId(int)
++ View getView(int,View,ViewGroup)
+}
+
+
+class com.example.finalproject.Adapters.CustomAdapterCM$ViewHolder {
+~ TextView tvInviteUser
+}
+
+class com.example.finalproject.Adapters.CustomAdapterHistory {
+- Context context
+- ArrayList<MatchClass> arrHistory
+- LayoutInflater inflater
++ {static} String score
++ int getCount()
++ Object getItem(int)
++ long getItemId(int)
++ View getView(int,View,ViewGroup)
+}
+
+
+class com.example.finalproject.Adapters.CustomAdapterHistory$ViewHolder {
+~ TextView u1VSu2TV
+}
+
+class com.example.finalproject.ReferencesFB {
++ {static} String Uid
++ {static} FirebaseAuth mAuth
++ {static} FirebaseDatabase FBDB
++ {static} DatabaseReference refUsers
++ {static} DatabaseReference refInvites
++ {static} DatabaseReference refPlayed
++ {static} DatabaseReference refNotPlayed
++ {static} FirebaseStorage storage
++ {static} StorageReference storageRef
++ {static} StorageReference imagesRef
++ {static} int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION
++ {static} int PICK_IMAGE_REQUEST
++ {static} int REQUEST_CAMERA_PERMISSION
++ {static} int REQUEST_IMAGE_CAPTURE
++ {static} int REQUEST_READ_EXTERNAL_STORAGE_PERMISSION
++ {static} int REQUEST_PICK_IMAGE
++ {static} int REQUEST_CODE_REMINDER
++ {static} int REQUEST_CODE_INVITE
++ {static} void getUser(FirebaseUser)
++ {static} boolean isValidEmail(String)
+}
+
+
+class com.example.finalproject.Activities.InvitationActivity {
+- RadioButton RB1
+- Button startBTN
+- TextView clearTV
+~ int year
+~ boolean level1
+~ boolean dateChoose
+~ String timeFormatStart
+~ InviteClass ic
+~ Calendar calNow
+~ Intent gi
+~ TimePickerDialog.OnTimeSetListener onTimeSetListener
+# void onCreate(Bundle)
+# void onStart()
+- void showDatePickerDialog()
++ void createBtn(View)
++ void startBTN(View)
+- void openTimePickerDialog(boolean)
+}
+
+
+class com.example.finalproject.Objs.UserDistanceClass {
+- UsersClass user
+- Float distance
++ UsersClass getUser()
++ void setUser(UsersClass)
++ Float getDistance()
++ void setDistance(Float)
+}
+
+
+class com.example.finalproject.Activities.CoachActivity {
+- ListView closeToYouLV
+- Button btnJoin
+~ boolean orderClass
+~ int position
+~ Intent si
+~ UsersClass user
+~ UserDistanceClass distance
+~ ArrayList<UserDistanceClass> arrDistance
+~ ArrayList<UsersClass> arrUsers
+~ CustomAdapterCoach customAdapterCoach
+~ AlertDialog.Builder adb
+~ Location tempLoc
++ {static} boolean cameFromCoach
+# void onCreate(Bundle)
++ void sortBTN(View)
++ void join(View)
++ void onItemClick(AdapterView<?>,View,int,long)
++ void onCreateContextMenu(ContextMenu,View,ContextMenu.ContextMenuInfo)
++ boolean onContextItemSelected(MenuItem)
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
+}
+
+
+class com.example.finalproject.Activities.JoinAsCoachActivity {
+- EditText yearsOfCoachingEt
+- RadioButton begCRB
+- Button btnFinish
+~ String coachType
+~ CoachUserClass userCoach
+~ Intent profileGI
+# void onCreate(Bundle)
++ void finishBTN(View)
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
+}
+
+
+class com.example.finalproject.Activities.SignUpActivity {
+- EditText emailET
+- CheckBox conCB
+- TextView suTV
+- Button loginBTN
+# void onCreate(Bundle)
++ void signup(View)
+- void loginOption()
+}
+
+
+
+
+androidx.appcompat.app.AppCompatActivity <|-- com.example.finalproject.Activities.ReminderActivity
+android.widget.BaseAdapter <|-- com.example.finalproject.Adapters.CustomAdapterUserInvites
+com.example.finalproject.Adapters.CustomAdapterUserInvites +.. com.example.finalproject.Adapters.CustomAdapterUserInvites$ViewHolder
+com.example.finalproject.Adapters.ViewHolder <|-- com.example.finalproject.Adapters.CustomAdapterUserInvites$ViewHolder
+androidx.appcompat.app.AppCompatActivity <|-- com.example.finalproject.Activities.RegisterActivity
+android.widget.BaseAdapter <|-- com.example.finalproject.Adapters.CustomAdapterCoach
+com.example.finalproject.Adapters.CustomAdapterCoach +.. com.example.finalproject.Adapters.CustomAdapterCoach$ViewHolder
+com.example.finalproject.Adapters.ViewHolder <|-- com.example.finalproject.Adapters.CustomAdapterCoach$ViewHolder
+android.widget.BaseAdapter <|-- com.example.finalproject.Adapters.CustomAdapterInvites
+com.example.finalproject.Adapters.CustomAdapterInvites +.. com.example.finalproject.Adapters.CustomAdapterInvites$ViewHolder
+com.example.finalproject.Adapters.ViewHolder <|-- com.example.finalproject.Adapters.CustomAdapterInvites$ViewHolder
+com.example.finalproject.Activities.OnItemClickListener <|.. com.example.finalproject.Activities.ProfileActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.finalproject.Activities.ProfileActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.finalproject.Activities.LoginActivity
+com.example.finalproject.Activities.OnItemLongClickListener <|.. com.example.finalproject.Activities.MainActivity
+com.example.finalproject.Activities.OnCreateContextMenuListener <|.. com.example.finalproject.Activities.MainActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.finalproject.Activities.MainActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.finalproject.Activities.OpeningActivity
+android.widget.BaseAdapter <|-- com.example.finalproject.Adapters.CustomAdapterCM
+com.example.finalproject.Adapters.CustomAdapterCM +.. com.example.finalproject.Adapters.CustomAdapterCM$ViewHolder
+com.example.finalproject.Adapters.ViewHolder <|-- com.example.finalproject.Adapters.CustomAdapterCM$ViewHolder
+android.widget.BaseAdapter <|-- com.example.finalproject.Adapters.CustomAdapterHistory
+com.example.finalproject.Adapters.CustomAdapterHistory +.. com.example.finalproject.Adapters.CustomAdapterHistory$ViewHolder
+com.example.finalproject.Adapters.ViewHolder <|-- com.example.finalproject.Adapters.CustomAdapterHistory$ViewHolder
+androidx.appcompat.app.AppCompatActivity <|-- com.example.finalproject.Activities.InvitationActivity
+com.example.finalproject.Activities.OnItemClickListener <|.. com.example.finalproject.Activities.CoachActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.finalproject.Activities.CoachActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.finalproject.Activities.JoinAsCoachActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.finalproject.Activities.SignUpActivity
+@enduml
