@@ -210,7 +210,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
                 public void onClick(DialogInterface dialog, int which) {
                     userProfile(arrHistory.get(position).getUidInviter());
                     editBTN.setVisibility(View.INVISIBLE);
-                    editBTN.setVisibility(View.INVISIBLE);
+                    editCoachBTN.setVisibility(View.INVISIBLE);
                     dialog.cancel();
                 }
             });
